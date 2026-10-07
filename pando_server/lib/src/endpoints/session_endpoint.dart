@@ -99,7 +99,16 @@ class SessionEndpoint extends Endpoint {
         .sendReportNotification
         .send(saved.id!);
     // Cloud Run: wake the maintenance job a little after the call is due.
-    await PandoServices.alarm.ringAt(runAt.add(alarmMargin));
+    // A failed alarm must not lose the walk: the call stays due, the next
+    // alarm runs it, and the Home row opens the report meanwhile.
+    try {
+      await PandoServices.alarm.ringAt(runAt.add(alarmMargin));
+    } catch (e) {
+      session.log(
+        'Maintenance alarm failed for session ${saved.id}: $e',
+        level: LogLevel.warning,
+      );
+    }
   }
 
   /// The maintenance job only runs calls that are already due.

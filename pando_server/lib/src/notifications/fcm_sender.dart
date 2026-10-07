@@ -2,30 +2,28 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:googleapis_auth/auth_io.dart';
+import 'package:http/http.dart' as http;
 
 import 'push_sender.dart';
 
-/// Firebase Cloud Messaging, HTTP v1 API. Signs in as the `pando-server`
-/// service account to get an OAuth access token.
+/// Firebase Cloud Messaging, HTTP v1 API, as the `pando-server` service
+/// account: from its key file locally, or Cloud Run's own identity (pass
+/// a metadata-server client to the constructor).
 class FcmSender implements PushSender {
-  FcmSender._(this._projectId, this._client);
+  FcmSender(this._projectId, this._client);
 
   static const _scope = 'https://www.googleapis.com/auth/firebase.messaging';
 
   final String _projectId;
-  final AutoRefreshingAuthClient _client;
+  final http.Client _client;
 
   /// Local development: the service account key file (gitignored).
   static Future<FcmSender> fromKeyFile(String path) async {
     final json = jsonDecode(await File(path).readAsString());
     final credentials = ServiceAccountCredentials.fromJson(json);
     final client = await clientViaServiceAccount(credentials, [_scope]);
-    return FcmSender._(json['project_id'] as String, client);
+    return FcmSender(json['project_id'] as String, client);
   }
-
-  /// Cloud Run: the service's own identity, from the metadata server.
-  static Future<FcmSender> fromMetadataServer(String projectId) async =>
-      FcmSender._(projectId, await clientViaMetadataServer());
 
   @override
   Future<bool> send({

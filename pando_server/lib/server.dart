@@ -7,6 +7,9 @@ import 'dart:io';
 import 'package:yaml/yaml.dart';
 
 import 'src/generated/serverpod.dart';
+import 'package:googleapis_auth/auth_io.dart';
+
+import 'src/notifications/cloud_tasks_alarm.dart';
 import 'src/notifications/fcm_sender.dart';
 import 'src/pando_services.dart';
 
@@ -46,32 +49,45 @@ void run(List<String> args) async {
     ),
   );
 
-  await _setUpReports();
-  _readPandoConfig(pod);
+  await _setUpPando(pod);
 
   // Start the server.
   await pod.start();
 }
 
-/// Picks the real push sender when Google credentials are available. The
-/// maintenance alarm stays [NoopAlarm] until the cloud round (slice 6).
-Future<void> _setUpReports() async {
+/// Pando's own settings in `config/<run mode>.yaml` (Serverpod ignores
+/// keys it doesn't know), and the report parts they select:
+/// - local: FCM with the service account key file, `NoopAlarm` (the
+///   always-on server runs future calls itself);
+/// - Cloud Run (a `cloud:` block, no key file in the image): FCM and the
+///   [CloudTasksAlarm] with the service's own identity.
+Future<void> _setUpPando(Serverpod pod) async {
+  final file = File('config/${pod.runMode}.yaml');
+  final yaml = file.existsSync() ? loadYaml(file.readAsStringSync()) : null;
+  final config = yaml is YamlMap ? yaml : YamlMap();
+
+  PandoServices.allowDemoSeed = config['allowDemoSeed'] == true;
+  stdout.writeln('Demo seed: ${PandoServices.allowDemoSeed ? 'on' : 'off'}');
+
   const keyFile = 'config/service-account.json';
+  final cloud = config['cloud'];
   if (File(keyFile).existsSync()) {
     PandoServices.push = await FcmSender.fromKeyFile(keyFile);
     stdout.writeln('Report push: FCM via $keyFile');
+  } else if (cloud is YamlMap) {
+    final google = await clientViaMetadataServer();
+    final project = cloud['project'] as String;
+    PandoServices.push = FcmSender(project, google);
+    PandoServices.alarm = CloudTasksAlarm(
+      client: google,
+      project: project,
+      region: cloud['region'] as String,
+      queue: cloud['alarmQueue'] as String,
+      job: cloud['maintenanceJob'] as String,
+      serviceAccount: cloud['serviceAccount'] as String,
+    );
+    stdout.writeln('Report push: FCM + Cloud Tasks alarm (Cloud Run identity)');
   } else {
     stdout.writeln('Report push: no $keyFile, pushes are only logged');
   }
-}
-
-/// Pando's own settings in `config/<run mode>.yaml` (Serverpod ignores
-/// keys it doesn't know).
-void _readPandoConfig(Serverpod pod) {
-  final file = File('config/${pod.runMode}.yaml');
-  if (!file.existsSync()) return;
-  final yaml = loadYaml(file.readAsStringSync());
-  PandoServices.allowDemoSeed =
-      yaml is YamlMap && yaml['allowDemoSeed'] == true;
-  stdout.writeln('Demo seed: ${PandoServices.allowDemoSeed ? 'on' : 'off'}');
 }

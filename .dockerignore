@@ -1,0 +1,13 @@
+# Docker build context is the repo root (see pando_server/Dockerfile).
+# Keep secrets, local state and the app out of the image.
+.git
+.dart_tool
+**/.dart_tool
+**/build
+pando_flutter
+pando_client
+pando_server/.serverpod
+pando_server/config/passwords.yaml
+pando_server/config/service-account.json
+**/.env
+**/.env.*

@@ -4,39 +4,43 @@
 # Terraform scripts to deploy your server, all you need to change in
 # this file is the examplepod.com domain name.
 
-# Configuration for the main API server.
+# Pando runs on Google Cloud Run with a Neon Postgres database.
+# Secrets never live here or in the image: Cloud Run passes them as
+# SERVERPOD_PASSWORD_<name> env vars from Secret Manager (see DEPLOYMENT.md).
+
+# Configuration for the main API server. Cloud Run terminates https and
+# forwards to port 8080. The public host is set with the
+# SERVERPOD_API_SERVER_PUBLIC_HOST env var after the first deploy.
 apiServer:
   port: 8080
-  publicHost: api.examplepod.com
+  publicHost: localhost
   publicPort: 443
   publicScheme: https
 
-# Configuration for the Insights server.
+# Configuration for the Insights server (not exposed on Cloud Run).
 insightsServer:
   port: 8081
-  publicHost: insights.examplepod.com
+  publicHost: localhost
   publicPort: 443
   publicScheme: https
 
-
-# This is the database setup for your servers. The default for the Google Cloud
-# Engine Terraform configuration is to connect on a private IP address.
-# If you are connecting on a public IP (e.g. on AWS or Google Cloud Run), you
-# connect on the public IP of the database e.g. database.examplepod.com.
+# Neon Postgres (region paired with Cloud Run). Direct host, no pooler.
+# The host comes from SERVERPOD_DATABASE_HOST and the password from
+# SERVERPOD_DATABASE_PASSWORD (Secret Manager), so neither is in this
+# public repo.
 database:
-  host: database.private-production.examplepod.com
+  host: set-by-env-SERVERPOD_DATABASE_HOST
   port: 5432
-  name: serverpod
-  user: postgres
+  name: neondb
+  user: neondb_owner
   requireSsl: true
-  #isUnixSocket: true # defaults to false
-  #maxConnectionCount: 10 # Defaults to 10, a negative or null value removes the limit
-
+  maxConnectionCount: 5
 
 maxRequestSize: 524288 # The maximum size of requests allowed in bytes
 
 sessionLogs:
-  consoleEnabled: false
+  # Cloud Run collects stdout, so logs show in the Cloud Run console.
+  consoleEnabled: true
 # persistentEnabled: true
 # consoleLogFormat: json # Defaults to "json", options are "text" or "json"
 
@@ -61,3 +65,14 @@ sessionLogs:
 #  #secure: true # Defaults to true; the cookie is only sent over https
 #allowedOrigins:
 #  - https://app.examplepod.com # The origin serving your Flutter web app
+
+# Pando: demo builds may seed three past walks (used for the demo video).
+allowDemoSeed: true
+
+# Pando: Google Cloud settings for the report alarm and push.
+cloud:
+  project: postulate-477006
+  region: asia-southeast1
+  alarmQueue: report-alarms
+  maintenanceJob: pando-maintenance
+  serviceAccount: pando-server@postulate-477006.iam.gserviceaccount.com
