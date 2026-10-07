@@ -1,0 +1,30 @@
+services:
+  # Development services
+  postgres:
+    image: ghcr.io/serverpod/postgres:16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: pando
+      POSTGRES_PASSWORD: "CtZhZKGEgpV8_CD38glvFsGOEF0_4UTF"
+    volumes:
+      - pando_data:/var/lib/postgresql/data
+
+
+  # Test services
+  postgres_test:
+    image: ghcr.io/serverpod/postgres:16
+    ports:
+      - "9090:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: pando_test
+      POSTGRES_PASSWORD: "hOIao4eR6Hlo6ZYlIuTJPy1cr-gDH57g"
+    volumes:
+      - pando_test_data:/var/lib/postgresql/data
+
+
+volumes:
+  pando_data:
+  pando_test_data:

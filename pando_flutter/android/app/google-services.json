@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "845810048567",
+    "project_id": "postulate-477006",
+    "storage_bucket": "postulate-477006.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845810048567:android:43f354c0dae7df7cb769b2",
+        "android_client_info": {
+          "package_name": "dev.pando.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhEmc8X6oX42u2SVYDtiwabIv9ouqOQpY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

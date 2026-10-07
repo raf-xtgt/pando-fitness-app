@@ -4,15 +4,17 @@
 .dart_tool/
 .packages
 build/
-# If you're building an application, you may want to check-in your pubspec.lock
-pubspec.lock
+
+# Pubspec overrides
+pubspec_overrides.yaml
 
 # Directory created by dartdoc
-# If you don't generate documentation locally you can remove this line.
 doc/api/
 
 # dotenv environment variables file
 .env*
+# Allow a secret-free example env file
+!.env.example
 
 # Avoid committing generated Javascript files:
 *.dart.js
@@ -28,5 +30,23 @@ doc/api/
 .flutter-plugins
 .flutter-plugins-dependencies
 
-# Allow a secret-free example env file
-!.env.example
+# Agents
+.dart_skills/
+.agents/
+.claude/
+.gemini/
+.cursor/
+.vscode/mcp.json
+.codex/
+.mcp.json
+
+# Serverpod Cloud CLI
+.scloud/
+
+# Pando: licensed art is credited in CREDITS.md, not redistributed
+pando_flutter/assets/art/
+
+# Pando: secrets
+pando_server/config/passwords.yaml
+pando_server/config/service-account.json
+pando_server/config/firebase_service_account_key.json
