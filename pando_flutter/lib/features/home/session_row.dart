@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 
+import '../../app/theme.dart';
 import '../activity/feel_question.dart';
 
 /// What one Home row shows. Built from a saved session, or from one still
@@ -8,6 +9,7 @@ import '../activity/feel_question.dart';
 class SessionRowData {
   const SessionRowData({
     required this.clientSessionId,
+    required this.sessionId,
     required this.endedAt,
     required this.distanceM,
     required this.goalMet,
@@ -17,6 +19,7 @@ class SessionRowData {
 
   factory SessionRowData.saved(ActivitySession s) => SessionRowData(
     clientSessionId: s.clientSessionId,
+    sessionId: s.id,
     endedAt: s.endedAt,
     distanceM: s.distanceM,
     goalMet: s.goalMet,
@@ -29,6 +32,7 @@ class SessionRowData {
   factory SessionRowData.pending(SessionInput input, double strideM) =>
       SessionRowData(
         clientSessionId: input.clientSessionId,
+        sessionId: null,
         endedAt: input.endedAt,
         distanceM: input.steps * strideM,
         goalMet: input.steps >= input.goalSteps,
@@ -37,6 +41,9 @@ class SessionRowData {
       );
 
   final String clientSessionId;
+
+  /// The server's id; null while the session waits in the pending queue.
+  final int? sessionId;
   final DateTime endedAt;
   final double distanceM;
   final bool goalMet;
@@ -44,12 +51,18 @@ class SessionRowData {
   final DateTime reportReadyAt;
 
   bool get reportPending => DateTime.now().isBefore(reportReadyAt);
+
+  /// The report opens once it's due and the server has the session.
+  bool get canOpenReport => sessionId != null && !reportPending;
 }
 
 class SessionRow extends StatelessWidget {
-  const SessionRow({super.key, required this.data});
+  const SessionRow({super.key, required this.data, this.onOpenReport});
 
   final SessionRowData data;
+
+  /// Called on tap once the report can open.
+  final VoidCallback? onOpenReport;
 
   static const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   static const _months = [
@@ -85,7 +98,7 @@ class SessionRow extends StatelessWidget {
       if (feel != null) 'felt ${FeelQuestion.labels[feel]!.toLowerCase()}',
     ].join(' · ');
 
-    return Padding(
+    final row = Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,6 +116,16 @@ class SessionRow extends StatelessWidget {
               style: text.bodyMedium!.copyWith(fontStyle: FontStyle.italic),
             ),
           ],
+        ],
+      ),
+    );
+    if (!data.canOpenReport || onOpenReport == null) return row;
+    return InkWell(
+      onTap: onOpenReport,
+      child: Row(
+        children: [
+          Expanded(child: row),
+          const Icon(Icons.chevron_right, color: PandoColors.ink),
         ],
       ),
     );

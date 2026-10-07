@@ -55,4 +55,14 @@ class ApiClient {
     await ensureSignedIn();
     return _client.session.list();
   }
+
+  Future<void> registerPushToken(String token) async {
+    await ensureSignedIn();
+    await _client.profile.registerPushToken(token);
+  }
+
+  Future<SessionReport> report(int sessionId) async {
+    await ensureSignedIn();
+    return _client.session.report(sessionId);
+  }
 }

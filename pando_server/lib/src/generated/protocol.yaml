@@ -5,7 +5,9 @@ jwtRefresh:
 profile:
   - get:
   - saveHeight:
+  - registerPushToken:
 session:
   - plan:
   - save:
+  - report:
   - list:

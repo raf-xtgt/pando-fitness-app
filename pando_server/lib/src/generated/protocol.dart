@@ -21,12 +21,16 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import 'activity_plan.dart' as _ic0xtzcg;
 import 'activity_session.dart' as _ij0gynqy;
 import 'feel.dart' as _ifrvopus;
+import 'future_calls_generated_models/send_report_notification_future_call_send_model.dart'
+    as _iz8uraq0;
 import 'session_input.dart' as _ikrqxmzf;
+import 'session_report.dart' as _iqhwxw5q;
 import 'user_profile.dart' as _ir2mn8w1;
 export 'activity_plan.dart';
 export 'activity_session.dart';
 export 'feel.dart';
 export 'session_input.dart';
+export 'session_report.dart';
 export 'user_profile.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
@@ -316,8 +320,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ifrvopus.Feel) {
       return _ifrvopus.Feel.fromJson(data) as T;
     }
+    if (t == _iz8uraq0.SendReportNotificationFutureCallSendModel) {
+      return _iz8uraq0.SendReportNotificationFutureCallSendModel.fromJson(data)
+          as T;
+    }
     if (t == _ikrqxmzf.SessionInput) {
       return _ikrqxmzf.SessionInput.fromJson(data) as T;
+    }
+    if (t == _iqhwxw5q.SessionReport) {
+      return _iqhwxw5q.SessionReport.fromJson(data) as T;
     }
     if (t == _ir2mn8w1.UserProfile) {
       return _ir2mn8w1.UserProfile.fromJson(data) as T;
@@ -332,8 +343,21 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_ifrvopus.Feel?>()) {
       return (data != null ? _ifrvopus.Feel.fromJson(data) : null) as T;
     }
+    if (t ==
+        _is.getType<_iz8uraq0.SendReportNotificationFutureCallSendModel?>()) {
+      return (data != null
+              ? _iz8uraq0.SendReportNotificationFutureCallSendModel.fromJson(
+                  data,
+                )
+              : null)
+          as T;
+    }
     if (t == _is.getType<_ikrqxmzf.SessionInput?>()) {
       return (data != null ? _ikrqxmzf.SessionInput.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_iqhwxw5q.SessionReport?>()) {
+      return (data != null ? _iqhwxw5q.SessionReport.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_ir2mn8w1.UserProfile?>()) {
       return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
@@ -364,7 +388,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ic0xtzcg.ActivityPlan => 'ActivityPlan',
       _ij0gynqy.ActivitySession => 'ActivitySession',
       _ifrvopus.Feel => 'Feel',
+      _iz8uraq0.SendReportNotificationFutureCallSendModel =>
+        'SendReportNotificationFutureCallSendModel',
       _ikrqxmzf.SessionInput => 'SessionInput',
+      _iqhwxw5q.SessionReport => 'SessionReport',
       _ir2mn8w1.UserProfile => 'UserProfile',
       _ => null,
     };
@@ -386,8 +413,12 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'ActivitySession';
       case _ifrvopus.Feel():
         return 'Feel';
+      case _iz8uraq0.SendReportNotificationFutureCallSendModel():
+        return 'SendReportNotificationFutureCallSendModel';
       case _ikrqxmzf.SessionInput():
         return 'SessionInput';
+      case _iqhwxw5q.SessionReport():
+        return 'SessionReport';
       case _ir2mn8w1.UserProfile():
         return 'UserProfile';
     }
@@ -425,8 +456,16 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Feel') {
       return deserialize<_ifrvopus.Feel>(data['data']);
     }
+    if (dataClassName == 'SendReportNotificationFutureCallSendModel') {
+      return deserialize<_iz8uraq0.SendReportNotificationFutureCallSendModel>(
+        data['data'],
+      );
+    }
     if (dataClassName == 'SessionInput') {
       return deserialize<_ikrqxmzf.SessionInput>(data['data']);
+    }
+    if (dataClassName == 'SessionReport') {
+      return deserialize<_iqhwxw5q.SessionReport>(data['data']);
     }
     if (dataClassName == 'UserProfile') {
       return deserialize<_ir2mn8w1.UserProfile>(data['data']);

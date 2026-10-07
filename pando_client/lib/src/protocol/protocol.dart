@@ -21,11 +21,13 @@ import 'activity_plan.dart' as _ic0xtzcg;
 import 'activity_session.dart' as _ij0gynqy;
 import 'feel.dart' as _ifrvopus;
 import 'session_input.dart' as _ikrqxmzf;
+import 'session_report.dart' as _iqhwxw5q;
 import 'user_profile.dart' as _ir2mn8w1;
 export 'activity_plan.dart';
 export 'activity_session.dart';
 export 'feel.dart';
 export 'session_input.dart';
+export 'session_report.dart';
 export 'user_profile.dart';
 export 'client.dart';
 
@@ -75,6 +77,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ikrqxmzf.SessionInput) {
       return _ikrqxmzf.SessionInput.fromJson(data) as T;
     }
+    if (t == _iqhwxw5q.SessionReport) {
+      return _iqhwxw5q.SessionReport.fromJson(data) as T;
+    }
     if (t == _ir2mn8w1.UserProfile) {
       return _ir2mn8w1.UserProfile.fromJson(data) as T;
     }
@@ -90,6 +95,10 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_ikrqxmzf.SessionInput?>()) {
       return (data != null ? _ikrqxmzf.SessionInput.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_iqhwxw5q.SessionReport?>()) {
+      return (data != null ? _iqhwxw5q.SessionReport.fromJson(data) : null)
+          as T;
     }
     if (t == _isc.getType<_ir2mn8w1.UserProfile?>()) {
       return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
@@ -118,6 +127,7 @@ class Protocol extends _isc.SerializationManager {
       _ij0gynqy.ActivitySession => 'ActivitySession',
       _ifrvopus.Feel => 'Feel',
       _ikrqxmzf.SessionInput => 'SessionInput',
+      _iqhwxw5q.SessionReport => 'SessionReport',
       _ir2mn8w1.UserProfile => 'UserProfile',
       _ => null,
     };
@@ -141,6 +151,8 @@ class Protocol extends _isc.SerializationManager {
         return 'Feel';
       case _ikrqxmzf.SessionInput():
         return 'SessionInput';
+      case _iqhwxw5q.SessionReport():
+        return 'SessionReport';
       case _ir2mn8w1.UserProfile():
         return 'UserProfile';
     }
@@ -176,6 +188,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'SessionInput') {
       return deserialize<_ikrqxmzf.SessionInput>(data['data']);
+    }
+    if (dataClassName == 'SessionReport') {
+      return deserialize<_iqhwxw5q.SessionReport>(data['data']);
     }
     if (dataClassName == 'UserProfile') {
       return deserialize<_ir2mn8w1.UserProfile>(data['data']);

@@ -2,7 +2,11 @@ import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/anonymous.dart';
 import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
+import 'dart:io';
+
 import 'src/generated/serverpod.dart';
+import 'src/notifications/fcm_sender.dart';
+import 'src/pando_services.dart';
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
@@ -40,6 +44,20 @@ void run(List<String> args) async {
     ),
   );
 
+  await _setUpReports();
+
   // Start the server.
   await pod.start();
+}
+
+/// Picks the real push sender when Google credentials are available. The
+/// maintenance alarm stays [NoopAlarm] until the cloud round (slice 6).
+Future<void> _setUpReports() async {
+  const keyFile = 'config/service-account.json';
+  if (File(keyFile).existsSync()) {
+    PandoServices.push = await FcmSender.fromKeyFile(keyFile);
+    stdout.writeln('Report push: FCM via $keyFile');
+  } else {
+    stdout.writeln('Report push: no $keyFile, pushes are only logged');
+  }
 }

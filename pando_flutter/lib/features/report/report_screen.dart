@@ -1,0 +1,180 @@
+import 'package:flutter/material.dart';
+import 'package:pando_client/pando_client.dart';
+
+import '../../app/theme.dart';
+import '../../services/app_services.dart';
+import '../home/session_row.dart';
+
+/// The delayed report for one session: a warm message, then the summary.
+/// Opened from the notification or a Home row; ✕ goes back.
+class ReportScreen extends StatefulWidget {
+  const ReportScreen({super.key, required this.sessionId});
+
+  final int sessionId;
+
+  @override
+  State<ReportScreen> createState() => _ReportScreenState();
+}
+
+class _ReportScreenState extends State<ReportScreen> {
+  late Future<SessionReport> _report = _load();
+
+  Future<SessionReport> _load() =>
+      AppServices.instance.api.report(widget.sessionId);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 12, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  tooltip: 'Close',
+                  iconSize: 32,
+                  color: PandoColors.ink,
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: FutureBuilder<SessionReport>(
+                    future: _report,
+                    builder: (context, snap) {
+                      if (snap.hasData) return _ReportBody(report: snap.data!);
+                      if (snap.hasError) {
+                        return _Unreachable(
+                          onRetry: () => setState(() => _report = _load()),
+                        );
+                      }
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: PandoColors.ink,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ReportBody extends StatelessWidget {
+  const _ReportBody({required this.report});
+
+  final SessionReport report;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return ListView(
+      children: [
+        Text(
+          'Your report',
+          style: text.headlineMedium!.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          SessionRow.formatDate(report.endedAt),
+          style: text.bodyLarge,
+        ),
+        const SizedBox(height: 28),
+        WobblyBox(
+          seed: 31,
+          strokeWidth: 2.6,
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+          child: Text(
+            report.message,
+            style: text.titleLarge!.copyWith(height: 1.35),
+          ),
+        ),
+        const SizedBox(height: 32),
+        _Line(label: 'This walk', value: '${report.distanceM.round()} m'),
+        _Line(
+          label: 'All your walks',
+          value: '${report.totalDistanceAllM.round()} m',
+        ),
+        _Line(
+          label: 'Goal accomplished',
+          value: report.goalMet ? 'Yes' : 'Not this time',
+        ),
+        _Line(
+          label: 'Extra distance',
+          value: '${report.extraM.round()} m',
+          valueColor: report.extraM > 0 ? PandoColors.fire : null,
+        ),
+      ],
+    );
+  }
+}
+
+/// One summary line: label on the left, value on the right, ink rule below.
+class _Line extends StatelessWidget {
+  const _Line({required this.label, required this.value, this.valueColor});
+
+  final String label;
+  final String value;
+  final Color? valueColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: PandoColors.ink, width: 1.2)),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: Text(label, style: text.bodyLarge)),
+          Text(
+            value,
+            style: text.titleMedium!.copyWith(
+              fontWeight: FontWeight.w700,
+              color: valueColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Unreachable extends StatelessWidget {
+  const _Unreachable({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "Pando couldn't reach your report just now.",
+            textAlign: TextAlign.center,
+            style: text.bodyLarge,
+          ),
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: onRetry,
+            child: const WobblyBox(seed: 7, child: Text('Try again')),
+          ),
+        ],
+      ),
+    );
+  }
+}

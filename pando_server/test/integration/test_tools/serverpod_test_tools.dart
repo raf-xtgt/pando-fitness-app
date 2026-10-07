@@ -15,7 +15,11 @@ import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:pando_server/src/generated/activity_plan.dart' as _imocqsb4;
 import 'package:pando_server/src/generated/activity_session.dart' as _inhq2gcy;
+import 'package:pando_server/src/generated/future_calls.dart' as _i8kxefyk;
+import 'package:pando_server/src/generated/future_calls_generated_models/send_report_notification_future_call_send_model.dart'
+    as _ibqygl5s;
 import 'package:pando_server/src/generated/session_input.dart' as _ioouzq3l;
+import 'package:pando_server/src/generated/session_report.dart' as _iyejdiwy;
 import 'package:pando_server/src/generated/user_profile.dart' as _ism2ds39;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -154,6 +158,8 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _AnonymousIdpEndpoint anonymousIdp;
 
   late final _JwtRefreshEndpoint jwtRefresh;
@@ -187,6 +193,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final sendReportNotification = _SendReportNotificationFutureCall();
 }
 
 class _AnonymousIdpEndpoint {
@@ -343,6 +353,37 @@ class _ProfileEndpoint {
       }
     });
   }
+
+  _ida.Future<void> registerPushToken(
+    _ist.TestSessionBuilder sessionBuilder,
+    String token,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'profile',
+            method: 'registerPushToken',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'profile',
+          methodName: 'registerPushToken',
+          parameters: _ist.testObjectToJson({'token': token}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _SessionEndpoint {
@@ -416,6 +457,37 @@ class _SessionEndpoint {
     });
   }
 
+  _ida.Future<_iyejdiwy.SessionReport> report(
+    _ist.TestSessionBuilder sessionBuilder,
+    int sessionId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'session',
+            method: 'report',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'session',
+          methodName: 'report',
+          parameters: _ist.testObjectToJson({'sessionId': sessionId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iyejdiwy.SessionReport>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<List<_inhq2gcy.ActivitySession>> list(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
@@ -444,5 +516,26 @@ class _SessionEndpoint {
         await _localUniqueSession.close();
       }
     });
+  }
+}
+
+class _SendReportNotificationFutureCall {
+  Future<void> send(
+    _ist.TestSessionBuilder sessionBuilder,
+    int sessionId,
+  ) async {
+    var object = _ibqygl5s.SendReportNotificationFutureCallSendModel(
+      sessionId: sessionId,
+    );
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
+    try {
+      await _i8kxefyk.SendReportNotificationSendFutureCall().invoke(
+        _localUniqueSession,
+        object,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

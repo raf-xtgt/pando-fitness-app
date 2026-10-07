@@ -6,6 +6,7 @@ import '../../app/theme.dart';
 import '../../services/app_services.dart';
 import '../../services/step_counter_service.dart';
 import '../activity/activity_screen.dart';
+import '../report/report_screen.dart';
 import 'session_row.dart';
 
 /// A big + to start walking, and the walks so far (newest first).
@@ -31,6 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _rows = _buildRows();
     unawaited(_refresh());
     _ticker = Timer.periodic(HomeScreen.rowTick, (_) => setState(() {}));
+    // Pando was opened by tapping a report notification.
+    final launchId = _services.push.takeLaunchSessionId();
+    if (launchId != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _openReport(launchId),
+      );
+    }
   }
 
   @override
@@ -57,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _refresh() async {
     try {
       await _services.queue.flush();
+      unawaited(_services.push.registerToken());
       final sessions = await _services.api.listSessions();
       await _services.cache.setSessions(sessions);
       if (_services.queue.pendingSessions.isEmpty) {
@@ -94,6 +103,18 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
     setState(() => _rows = _buildRows());
     unawaited(_refresh());
+    // "Report on its way" is now on screen, so the prompt makes sense.
+    await _services.push.askPermissionOnce();
+    await _services.push.registerToken();
+  }
+
+  Future<void> _openReport(int sessionId) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ReportScreen(sessionId: sessionId),
+      ),
+    );
+    if (mounted) setState(() => _rows = _buildRows());
   }
 
   @override
@@ -153,7 +174,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 4),
                 for (final row in _rows) ...[
                   const Divider(color: PandoColors.ink, thickness: 1.2),
-                  SessionRow(data: row),
+                  SessionRow(
+                    data: row,
+                    onOpenReport: () => _openReport(row.sessionId!),
+                  ),
                 ],
               ],
             ],

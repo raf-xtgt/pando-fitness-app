@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:pando_server/src/generated/future_calls.dart' as _i8kxefyk;
 import 'package:pando_server/src/generated/session_input.dart' as _ioouzq3l;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -20,6 +21,7 @@ import '../auth/anonymous_idp_endpoint.dart' as _in0zita6;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/profile_endpoint.dart' as _i2cx2pww;
 import '../endpoints/session_endpoint.dart' as _ih5ivktc;
+export 'future_calls.dart' show ServerpodFutureCallsGetter;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -135,6 +137,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['heightM'],
                   ),
         ),
+        'registerPushToken': _is.MethodConnector(
+          name: 'registerPushToken',
+          params: {
+            'token': _is.ParameterDescription(
+              name: 'token',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['profile'] as _i2cx2pww.ProfileEndpoint)
+                  .registerPushToken(
+                    session,
+                    params['token'],
+                  ),
+        ),
       },
     );
     connectors['session'] = _is.EndpointConnector(
@@ -170,6 +191,25 @@ class Endpoints extends _is.EndpointDispatch {
                     params['input'],
                   ),
         ),
+        'report': _is.MethodConnector(
+          name: 'report',
+          params: {
+            'sessionId': _is.ParameterDescription(
+              name: 'sessionId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['session'] as _ih5ivktc.SessionEndpoint).report(
+                    session,
+                    params['sessionId'],
+                  ),
+        ),
         'list': _is.MethodConnector(
           name: 'list',
           params: {},
@@ -186,5 +226,10 @@ class Endpoints extends _is.EndpointDispatch {
       ..initializeEndpoints(server);
     modules['serverpod_auth_core'] = _iacs.Endpoints()
       ..initializeEndpoints(server);
+  }
+
+  @override
+  _is.FutureCallDispatch? get futureCalls {
+    return _i8kxefyk.FutureCalls();
   }
 }

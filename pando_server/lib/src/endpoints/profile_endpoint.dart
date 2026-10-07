@@ -28,4 +28,20 @@ class ProfileEndpoint extends Endpoint {
       existing.copyWith(heightM: heightM),
     );
   }
+
+  /// Stores the phone's push token so the delayed report can reach it.
+  Future<void> registerPushToken(Session session, String token) async {
+    final existing = await session.callerProfile();
+    if (existing == null) {
+      await UserProfile.db.insertRow(
+        session,
+        UserProfile(authUserId: session.callerAuthUserId, fcmToken: token),
+      );
+    } else if (existing.fcmToken != token) {
+      await UserProfile.db.updateRow(
+        session,
+        existing.copyWith(fcmToken: token),
+      );
+    }
+  }
 }

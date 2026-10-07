@@ -67,12 +67,14 @@ class PendingQueue {
 
   static const saveHeightOp = 'saveHeight';
   static const saveSessionOp = 'saveSession';
+  static const registerPushTokenOp = 'registerPushToken';
 
   Future<void> _send(String op, Map payload) => switch (op) {
     saveHeightOp => _api.saveHeight((payload['heightM'] as num).toDouble()),
     saveSessionOp => _api.saveSession(
       SessionInput.fromJson(payload.cast<String, dynamic>()),
     ),
+    registerPushTokenOp => _api.registerPushToken(payload['token'] as String),
     _ => throw UnsupportedError('Unknown queued op $op'),
   };
 }

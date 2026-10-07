@@ -15,6 +15,7 @@ import 'package:http/http.dart' as _i85jenna;
 import 'package:pando_client/src/protocol/activity_plan.dart' as _i4ejyc17;
 import 'package:pando_client/src/protocol/activity_session.dart' as _itsbeekw;
 import 'package:pando_client/src/protocol/session_input.dart' as _i6unmrz6;
+import 'package:pando_client/src/protocol/session_report.dart' as _i8rxrde7;
 import 'package:pando_client/src/protocol/user_profile.dart' as _i7vdt7l1;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -109,6 +110,14 @@ class EndpointProfile extends _isc.EndpointRef {
         'saveHeight',
         {'heightM': heightM},
       );
+
+  /// Stores the phone's push token so the delayed report can reach it.
+  _ida.Future<void> registerPushToken(String token) =>
+      caller.callServerEndpoint<void>(
+        'profile',
+        'registerPushToken',
+        {'token': token},
+      );
 }
 
 /// Activity sessions: what to aim for next, saving a finished walk, and the
@@ -135,6 +144,14 @@ class EndpointSession extends _isc.EndpointRef {
         'session',
         'save',
         {'input': input},
+      );
+
+  /// The report for one of the caller's sessions.
+  _ida.Future<_i8rxrde7.SessionReport> report(int sessionId) =>
+      caller.callServerEndpoint<_i8rxrde7.SessionReport>(
+        'session',
+        'report',
+        {'sessionId': sessionId},
       );
 
   /// The caller's sessions, newest first.

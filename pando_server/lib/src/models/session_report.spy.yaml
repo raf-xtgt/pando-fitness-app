@@ -1,0 +1,11 @@
+### The delayed report for one session (shown on the Report screen).
+class: SessionReport
+fields:
+  sessionId: int
+  endedAt: DateTime
+  message: String
+  distanceM: double
+  ### Distance across every session up to and including this one.
+  totalDistanceAllM: double
+  goalMet: bool
+  extraM: double
