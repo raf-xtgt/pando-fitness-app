@@ -1,0 +1,7 @@
+### The answer to "How did that feel?" (optional).
+enum: Feel
+serialized: byName
+values:
+  - tooEasy
+  - justRight
+  - tooHard

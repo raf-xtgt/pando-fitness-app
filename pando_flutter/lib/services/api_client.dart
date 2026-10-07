@@ -39,4 +39,20 @@ class ApiClient {
     await ensureSignedIn();
     return _client.profile.saveHeight(heightM);
   }
+
+  Future<ActivityPlan> plan() async {
+    await ensureSignedIn();
+    return _client.session.plan();
+  }
+
+  /// Safe to retry: the server ignores a second save of the same session.
+  Future<ActivitySession> saveSession(SessionInput input) async {
+    await ensureSignedIn();
+    return _client.session.save(input);
+  }
+
+  Future<List<ActivitySession>> listSessions() async {
+    await ensureSignedIn();
+    return _client.session.list();
+  }
 }

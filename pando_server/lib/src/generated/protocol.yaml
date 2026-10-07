@@ -5,3 +5,7 @@ jwtRefresh:
 profile:
   - get:
   - saveHeight:
+session:
+  - plan:
+  - save:
+  - list:

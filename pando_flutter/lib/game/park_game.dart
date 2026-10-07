@@ -15,8 +15,9 @@ import 'components/wooden_sign.dart';
 import 'park_path.dart';
 
 /// The isometric park. This is the map boundary: the Activity screen only
-/// talks to the game through [setDistance] and [setGait] (plus the start
-/// values passed in). The game knows nothing about steps or the server.
+/// talks to the game through [setDistance], [setGait] and [placeSign]
+/// (plus the start values passed in). The game knows nothing about steps or
+/// the server.
 class ParkGame extends FlameGame {
   ParkGame({this.resumeMetres = 0, this.signMetres = const [0]});
 
@@ -87,6 +88,12 @@ class ParkGame extends FlameGame {
   void setGait(Gait gait) {
     if (!isLoaded) return;
     _runner.gait = gait;
+  }
+
+  /// Puts a wooden sign at a journey position (metres), e.g. on Stop.
+  void placeSign(double pathMetres) {
+    if (!isLoaded) return;
+    world.add(WoodenSign(path: _path, atPixels: pathMetres * pixelsPerMetre));
   }
 
   @override

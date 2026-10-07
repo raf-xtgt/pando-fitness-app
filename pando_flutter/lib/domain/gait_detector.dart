@@ -12,6 +12,16 @@ class StepSample {
   final int steps;
 }
 
+/// The step count known at [time]: the last sample at or before it.
+int stepsAt(List<StepSample> timeline, DateTime time) {
+  var steps = 0;
+  for (final sample in timeline) {
+    if (sample.time.isAfter(time)) break;
+    steps = sample.steps;
+  }
+  return steps;
+}
+
 class GaitDetector {
   const GaitDetector({
     this.cadenceWindow = const Duration(seconds: 10),
@@ -33,8 +43,8 @@ class GaitDetector {
   Gait classify(List<StepSample> timeline, DateTime now) {
     if (timeline.isEmpty) return Gait.standing;
 
-    final stepsNow = _stepsAt(timeline, now);
-    if (stepsNow - _stepsAt(timeline, now.subtract(standingWindow)) < 1) {
+    final stepsNow = stepsAt(timeline, now);
+    if (stepsNow - stepsAt(timeline, now.subtract(standingWindow)) < 1) {
       return Gait.standing;
     }
 
@@ -53,17 +63,7 @@ class GaitDetector {
     }
     final seconds = now.difference(windowStart).inMilliseconds / 1000;
     if (seconds <= 0) return 0;
-    final steps = _stepsAt(timeline, now) - _stepsAt(timeline, windowStart);
+    final steps = stepsAt(timeline, now) - stepsAt(timeline, windowStart);
     return steps / seconds * 60;
-  }
-
-  /// The step count known at [time]: the last sample at or before it.
-  static int _stepsAt(List<StepSample> timeline, DateTime time) {
-    var steps = 0;
-    for (final sample in timeline) {
-      if (sample.time.isAfter(time)) break;
-      steps = sample.steps;
-    }
-    return steps;
   }
 }

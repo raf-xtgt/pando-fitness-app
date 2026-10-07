@@ -12,6 +12,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
+import 'package:pando_client/src/protocol/activity_plan.dart' as _i4ejyc17;
+import 'package:pando_client/src/protocol/activity_session.dart' as _itsbeekw;
+import 'package:pando_client/src/protocol/session_input.dart' as _i6unmrz6;
 import 'package:pando_client/src/protocol/user_profile.dart' as _i7vdt7l1;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -108,6 +111,41 @@ class EndpointProfile extends _isc.EndpointRef {
       );
 }
 
+/// Activity sessions: what to aim for next, saving a finished walk, and the
+/// history for Home. Every call is scoped to the signed-in user.
+/// {@category Endpoint}
+class EndpointSession extends _isc.EndpointRef {
+  EndpointSession(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'session';
+
+  /// The goal, stride, resume point and signs for the next activity.
+  _ida.Future<_i4ejyc17.ActivityPlan> plan() =>
+      caller.callServerEndpoint<_i4ejyc17.ActivityPlan>(
+        'session',
+        'plan',
+        {},
+      );
+
+  /// Saves a finished session. Safe to retry: a second call with the same
+  /// `clientSessionId` returns the first result and changes nothing.
+  _ida.Future<_itsbeekw.ActivitySession> save(_i6unmrz6.SessionInput input) =>
+      caller.callServerEndpoint<_itsbeekw.ActivitySession>(
+        'session',
+        'save',
+        {'input': input},
+      );
+
+  /// The caller's sessions, newest first.
+  _ida.Future<List<_itsbeekw.ActivitySession>> list() =>
+      caller.callServerEndpoint<List<_itsbeekw.ActivitySession>>(
+        'session',
+        'list',
+        {},
+      );
+}
+
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _iaic.Caller(client);
@@ -149,6 +187,7 @@ class Client extends _isc.ServerpodClientShared {
     anonymousIdp = EndpointAnonymousIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     profile = EndpointProfile(this);
+    session = EndpointSession(this);
     modules = Modules(this);
   }
 
@@ -158,6 +197,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointProfile profile;
 
+  late final EndpointSession session;
+
   late final Modules modules;
 
   @override
@@ -165,6 +206,7 @@ class Client extends _isc.ServerpodClientShared {
     'anonymousIdp': anonymousIdp,
     'jwtRefresh': jwtRefresh,
     'profile': profile,
+    'session': session,
   };
 
   @override

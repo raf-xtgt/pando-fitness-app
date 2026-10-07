@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:pando_server/src/generated/session_input.dart' as _ioouzq3l;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -18,6 +19,7 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import '../auth/anonymous_idp_endpoint.dart' as _in0zita6;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/profile_endpoint.dart' as _i2cx2pww;
+import '../endpoints/session_endpoint.dart' as _ih5ivktc;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -39,6 +41,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'profile',
+          null,
+        ),
+      'session': _ih5ivktc.SessionEndpoint()
+        ..initialize(
+          server,
+          'session',
           null,
         ),
     };
@@ -126,6 +134,51 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['heightM'],
                   ),
+        ),
+      },
+    );
+    connectors['session'] = _is.EndpointConnector(
+      name: 'session',
+      endpoint: endpoints['session']!,
+      methodConnectors: {
+        'plan': _is.MethodConnector(
+          name: 'plan',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['session'] as _ih5ivktc.SessionEndpoint)
+                  .plan(session),
+        ),
+        'save': _is.MethodConnector(
+          name: 'save',
+          params: {
+            'input': _is.ParameterDescription(
+              name: 'input',
+              type: _is.getType<_ioouzq3l.SessionInput>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['session'] as _ih5ivktc.SessionEndpoint).save(
+                    session,
+                    params['input'],
+                  ),
+        ),
+        'list': _is.MethodConnector(
+          name: 'list',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['session'] as _ih5ivktc.SessionEndpoint)
+                  .list(session),
         ),
       },
     );

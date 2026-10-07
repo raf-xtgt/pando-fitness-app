@@ -4,11 +4,21 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 
 import '../../domain/gait_detector.dart';
+import '../../domain/passive_signals.dart';
 import '../../services/step_counter_service.dart';
 
-/// Where the activity is. Later slices add stopped → celebrating → asking
-/// → saving → done.
-enum ActivityState { ready, moving, standing }
+/// Where the activity is: `ready → moving ↔ standing → asking → done`.
+/// Slice 5 adds `celebrating` between Stop and the question.
+enum ActivityState {
+  ready,
+  moving,
+  standing,
+  asking,
+  done;
+
+  /// Still counting steps.
+  bool get isLive => index <= standing.index;
+}
 
 /// Turns step events into distance and gait for the Activity screen.
 class ActivityController extends ChangeNotifier {
@@ -35,6 +45,10 @@ class ActivityController extends ChangeNotifier {
   ActivityState state = ActivityState.ready;
   Gait gait = Gait.standing;
 
+  late final DateTime startedAt;
+  DateTime? endedAt;
+  PassiveSignals? signals;
+
   int get steps => _steps.stepsSoFar;
 
   /// Distance covered this session.
@@ -43,13 +57,39 @@ class ActivityController extends ChangeNotifier {
   /// Never below zero; going past the goal is shown differently (slice 5).
   double get remainingMetres => math.max(0, goalMetres - metres);
 
+  bool get goalMet => metres >= goalMetres;
+
   void start() {
+    startedAt = DateTime.now();
     _steps.start();
     _stepSub = _steps.steps.listen((_) => _evaluate());
     _ticker = Timer.periodic(gaitTick, (_) => _evaluate());
   }
 
+  /// Ends step counting and works out the passive signals.
+  void stop() {
+    if (!state.isLive) return;
+    _ticker?.cancel();
+    _stepSub?.cancel();
+    endedAt = DateTime.now();
+    signals = PassiveSignals.compute(
+      timeline: _steps.timeline,
+      endedAt: endedAt!,
+      goalMet: goalMet,
+    );
+    gait = Gait.standing;
+    state = ActivityState.asking;
+    notifyListeners();
+  }
+
+  /// The feel question was answered or skipped.
+  void finish() {
+    state = ActivityState.done;
+    notifyListeners();
+  }
+
   void _evaluate() {
+    if (!state.isLive) return;
     final newGait = gaitDetector.classify(_steps.timeline, DateTime.now());
     final newState = switch ((state, newGait)) {
       (ActivityState.ready, Gait.standing) => ActivityState.ready,

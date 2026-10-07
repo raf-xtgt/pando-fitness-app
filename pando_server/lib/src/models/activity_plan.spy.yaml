@@ -1,0 +1,10 @@
+### What the phone needs to start the next activity.
+class: ActivityPlan
+fields:
+  goalSteps: int
+  goalM: double
+  strideM: double
+  ### Where the runner starts (the last session's end, or 0).
+  resumeMetres: double
+  ### Journey positions of every wooden sign: the start (0) and each session's end.
+  signMetres: List<double>

@@ -1,0 +1,12 @@
+### What the phone sends when a session ends.
+class: SessionInput
+fields:
+  clientSessionId: String
+  startedAt: DateTime
+  endedAt: DateTime
+  steps: int
+  ### The goal from the plan the phone used for this session.
+  goalSteps: int
+  feel: Feel?
+  ### Passive signal from the step timeline (see passive_signals.dart).
+  paceDropped: bool

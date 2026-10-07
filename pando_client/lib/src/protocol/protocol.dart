@@ -11,12 +11,21 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:pando_client/src/protocol/activity_session.dart' as _itsbeekw;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'activity_plan.dart' as _ic0xtzcg;
+import 'activity_session.dart' as _ij0gynqy;
+import 'feel.dart' as _ifrvopus;
+import 'session_input.dart' as _ikrqxmzf;
 import 'user_profile.dart' as _ir2mn8w1;
+export 'activity_plan.dart';
+export 'activity_session.dart';
+export 'feel.dart';
+export 'session_input.dart';
 export 'user_profile.dart';
 export 'client.dart';
 
@@ -54,11 +63,45 @@ class Protocol extends _isc.SerializationManager {
       }
     }
 
+    if (t == _ic0xtzcg.ActivityPlan) {
+      return _ic0xtzcg.ActivityPlan.fromJson(data) as T;
+    }
+    if (t == _ij0gynqy.ActivitySession) {
+      return _ij0gynqy.ActivitySession.fromJson(data) as T;
+    }
+    if (t == _ifrvopus.Feel) {
+      return _ifrvopus.Feel.fromJson(data) as T;
+    }
+    if (t == _ikrqxmzf.SessionInput) {
+      return _ikrqxmzf.SessionInput.fromJson(data) as T;
+    }
     if (t == _ir2mn8w1.UserProfile) {
       return _ir2mn8w1.UserProfile.fromJson(data) as T;
     }
+    if (t == _isc.getType<_ic0xtzcg.ActivityPlan?>()) {
+      return (data != null ? _ic0xtzcg.ActivityPlan.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ij0gynqy.ActivitySession?>()) {
+      return (data != null ? _ij0gynqy.ActivitySession.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_ifrvopus.Feel?>()) {
+      return (data != null ? _ifrvopus.Feel.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ikrqxmzf.SessionInput?>()) {
+      return (data != null ? _ikrqxmzf.SessionInput.fromJson(data) : null) as T;
+    }
     if (t == _isc.getType<_ir2mn8w1.UserProfile?>()) {
       return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
+    }
+    if (t == List<double>) {
+      return (data as List).map((e) => deserialize<double>(e)).toList() as T;
+    }
+    if (t == List<_itsbeekw.ActivitySession>) {
+      return (data as List)
+              .map((e) => deserialize<_itsbeekw.ActivitySession>(e))
+              .toList()
+          as T;
     }
     try {
       return _iaic.Protocol().deserialize<T>(data, t);
@@ -71,6 +114,10 @@ class Protocol extends _isc.SerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _ic0xtzcg.ActivityPlan => 'ActivityPlan',
+      _ij0gynqy.ActivitySession => 'ActivitySession',
+      _ifrvopus.Feel => 'Feel',
+      _ikrqxmzf.SessionInput => 'SessionInput',
       _ir2mn8w1.UserProfile => 'UserProfile',
       _ => null,
     };
@@ -86,6 +133,14 @@ class Protocol extends _isc.SerializationManager {
     }
 
     switch (data) {
+      case _ic0xtzcg.ActivityPlan():
+        return 'ActivityPlan';
+      case _ij0gynqy.ActivitySession():
+        return 'ActivitySession';
+      case _ifrvopus.Feel():
+        return 'Feel';
+      case _ikrqxmzf.SessionInput():
+        return 'SessionInput';
       case _ir2mn8w1.UserProfile():
         return 'UserProfile';
     }
@@ -109,6 +164,18 @@ class Protocol extends _isc.SerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'ActivityPlan') {
+      return deserialize<_ic0xtzcg.ActivityPlan>(data['data']);
+    }
+    if (dataClassName == 'ActivitySession') {
+      return deserialize<_ij0gynqy.ActivitySession>(data['data']);
+    }
+    if (dataClassName == 'Feel') {
+      return deserialize<_ifrvopus.Feel>(data['data']);
+    }
+    if (dataClassName == 'SessionInput') {
+      return deserialize<_ikrqxmzf.SessionInput>(data['data']);
     }
     if (dataClassName == 'UserProfile') {
       return deserialize<_ir2mn8w1.UserProfile>(data['data']);

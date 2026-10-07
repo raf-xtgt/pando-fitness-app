@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:pando_client/pando_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 import 'api_client.dart';
 
@@ -58,8 +58,21 @@ class PendingQueue {
     }
   }
 
+  /// Sessions saved on the phone but not yet on the server, oldest first.
+  List<SessionInput> get pendingSessions => [
+    for (final item in items)
+      if (item['op'] == saveSessionOp)
+        SessionInput.fromJson(item['payload'] as Map<String, dynamic>),
+  ];
+
+  static const saveHeightOp = 'saveHeight';
+  static const saveSessionOp = 'saveSession';
+
   Future<void> _send(String op, Map payload) => switch (op) {
-    'saveHeight' => _api.saveHeight((payload['heightM'] as num).toDouble()),
+    saveHeightOp => _api.saveHeight((payload['heightM'] as num).toDouble()),
+    saveSessionOp => _api.saveSession(
+      SessionInput.fromJson(payload.cast<String, dynamic>()),
+    ),
     _ => throw UnsupportedError('Unknown queued op $op'),
   };
 }

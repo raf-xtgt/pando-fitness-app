@@ -11,13 +11,22 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:pando_server/src/generated/activity_session.dart' as _inhq2gcy;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'activity_plan.dart' as _ic0xtzcg;
+import 'activity_session.dart' as _ij0gynqy;
+import 'feel.dart' as _ifrvopus;
+import 'session_input.dart' as _ikrqxmzf;
 import 'user_profile.dart' as _ir2mn8w1;
+export 'activity_plan.dart';
+export 'activity_session.dart';
+export 'feel.dart';
+export 'session_input.dart';
 export 'user_profile.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
@@ -28,6 +37,187 @@ class Protocol extends _is.DatabaseSerializationManager {
   static final Protocol _instance = Protocol._().._registerHostProtocols();
 
   static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
+      name: 'activity_session',
+      dartName: 'ActivitySession',
+      schema: 'public',
+      module: 'pando',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'profileId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'clientSessionId',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'startedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'endedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'steps',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'strideM',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+        _isp.ColumnDefinition(
+          name: 'distanceM',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+        _isp.ColumnDefinition(
+          name: 'goalSteps',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'goalM',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+        _isp.ColumnDefinition(
+          name: 'goalMet',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _isp.ColumnDefinition(
+          name: 'extraM',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+        _isp.ColumnDefinition(
+          name: 'feel',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'protocol:Feel?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'stoppedEarly',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _isp.ColumnDefinition(
+          name: 'paceDropped',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _isp.ColumnDefinition(
+          name: 'startPathM',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+        _isp.ColumnDefinition(
+          name: 'endPathM',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+        _isp.ColumnDefinition(
+          name: 'reportMessage',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'reportReadyAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'notificationSentAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'isSeeded',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'activity_session_fk_0',
+          columns: ['profileId'],
+          referenceTable: 'user_profile',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'activity_session_client_id_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'clientSessionId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'activity_session_profile_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'profileId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'endedAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     _isp.TableDefinition(
       name: 'user_profile',
       dartName: 'UserProfile',
@@ -117,11 +307,45 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
+    if (t == _ic0xtzcg.ActivityPlan) {
+      return _ic0xtzcg.ActivityPlan.fromJson(data) as T;
+    }
+    if (t == _ij0gynqy.ActivitySession) {
+      return _ij0gynqy.ActivitySession.fromJson(data) as T;
+    }
+    if (t == _ifrvopus.Feel) {
+      return _ifrvopus.Feel.fromJson(data) as T;
+    }
+    if (t == _ikrqxmzf.SessionInput) {
+      return _ikrqxmzf.SessionInput.fromJson(data) as T;
+    }
     if (t == _ir2mn8w1.UserProfile) {
       return _ir2mn8w1.UserProfile.fromJson(data) as T;
     }
+    if (t == _is.getType<_ic0xtzcg.ActivityPlan?>()) {
+      return (data != null ? _ic0xtzcg.ActivityPlan.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ij0gynqy.ActivitySession?>()) {
+      return (data != null ? _ij0gynqy.ActivitySession.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ifrvopus.Feel?>()) {
+      return (data != null ? _ifrvopus.Feel.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ikrqxmzf.SessionInput?>()) {
+      return (data != null ? _ikrqxmzf.SessionInput.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_ir2mn8w1.UserProfile?>()) {
       return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
+    }
+    if (t == List<double>) {
+      return (data as List).map((e) => deserialize<double>(e)).toList() as T;
+    }
+    if (t == List<_inhq2gcy.ActivitySession>) {
+      return (data as List)
+              .map((e) => deserialize<_inhq2gcy.ActivitySession>(e))
+              .toList()
+          as T;
     }
     try {
       return _iais.Protocol().deserialize<T>(data, t);
@@ -137,6 +361,10 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _ic0xtzcg.ActivityPlan => 'ActivityPlan',
+      _ij0gynqy.ActivitySession => 'ActivitySession',
+      _ifrvopus.Feel => 'Feel',
+      _ikrqxmzf.SessionInput => 'SessionInput',
       _ir2mn8w1.UserProfile => 'UserProfile',
       _ => null,
     };
@@ -152,6 +380,14 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
+      case _ic0xtzcg.ActivityPlan():
+        return 'ActivityPlan';
+      case _ij0gynqy.ActivitySession():
+        return 'ActivitySession';
+      case _ifrvopus.Feel():
+        return 'Feel';
+      case _ikrqxmzf.SessionInput():
+        return 'SessionInput';
       case _ir2mn8w1.UserProfile():
         return 'UserProfile';
     }
@@ -179,6 +415,18 @@ class Protocol extends _is.DatabaseSerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'ActivityPlan') {
+      return deserialize<_ic0xtzcg.ActivityPlan>(data['data']);
+    }
+    if (dataClassName == 'ActivitySession') {
+      return deserialize<_ij0gynqy.ActivitySession>(data['data']);
+    }
+    if (dataClassName == 'Feel') {
+      return deserialize<_ifrvopus.Feel>(data['data']);
+    }
+    if (dataClassName == 'SessionInput') {
+      return deserialize<_ikrqxmzf.SessionInput>(data['data']);
     }
     if (dataClassName == 'UserProfile') {
       return deserialize<_ir2mn8w1.UserProfile>(data['data']);
@@ -224,6 +472,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
     switch (t) {
+      case _ij0gynqy.ActivitySession:
+        return _ij0gynqy.ActivitySession.t;
       case _ir2mn8w1.UserProfile:
         return _ir2mn8w1.UserProfile.t;
     }

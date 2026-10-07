@@ -1,0 +1,38 @@
+### One walk or run, saved once after the feel question.
+class: ActivitySession
+table: activity_session
+fields:
+  ### The owner's profile.
+  profileId: int, relation(parent=user_profile)
+  ### Made on the phone at Start; makes save() safe to retry.
+  clientSessionId: String
+  startedAt: DateTime
+  endedAt: DateTime
+  steps: int
+  strideM: double
+  distanceM: double
+  ### The goal the walker saw during this session.
+  goalSteps: int
+  goalM: double
+  goalMet: bool
+  ### Distance past the goal (0 if the goal wasn't met).
+  extraM: double
+  feel: Feel?
+  stoppedEarly: bool
+  paceDropped: bool
+  ### Journey position (metres along the endless path) at start and end.
+  startPathM: double
+  endPathM: double
+  ### Filled in by the report builder (slice 4).
+  reportMessage: String?
+  ### Report and notification are due 5 minutes after the session ends.
+  reportReadyAt: DateTime
+  notificationSentAt: DateTime?
+  ### Demo-only history (slice 5).
+  isSeeded: bool, default=false
+indexes:
+  activity_session_client_id_idx:
+    fields: clientSessionId
+    unique: true
+  activity_session_profile_idx:
+    fields: profileId, endedAt

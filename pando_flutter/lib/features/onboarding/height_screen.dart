@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../domain/units.dart';
 import '../../services/app_services.dart';
+import '../../services/pending_queue.dart';
 import '../home/home_screen.dart';
 import 'ruler_slider.dart';
 
@@ -25,7 +26,9 @@ class _HeightScreenState extends State<HeightScreen> {
     // Cached first, so Pando works even if the server can't be reached;
     // the queue sends it when it can.
     await services.cache.setHeightMetres(metres);
-    unawaited(services.queue.add('saveHeight', {'heightM': metres}));
+    unawaited(
+      services.queue.add(PendingQueue.saveHeightOp, {'heightM': metres}),
+    );
     if (!mounted) return;
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
