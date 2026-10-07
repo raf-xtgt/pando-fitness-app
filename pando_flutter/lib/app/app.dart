@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../features/home/home_screen.dart';
+import '../features/splash/splash_screen.dart';
 import 'theme.dart';
 
-/// The app shell. Splash and Height arrive in slice 2, Report in slice 4.
+/// The app shell: Splash → Height (first launch) or Home. Report arrives in
+/// slice 4.
 class PandoApp extends StatelessWidget {
   const PandoApp({super.key});
 
@@ -13,7 +14,7 @@ class PandoApp extends StatelessWidget {
       title: 'Pando',
       debugShowCheckedModeBanner: false,
       theme: buildPandoTheme(),
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

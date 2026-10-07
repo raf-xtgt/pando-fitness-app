@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/config.dart';
 import '../../game/park_game.dart';
+import '../../services/app_services.dart';
 import 'activity_controller.dart';
 import 'distance_display.dart';
 
@@ -16,8 +17,7 @@ class ActivityScreen extends StatefulWidget {
 }
 
 class _ActivityScreenState extends State<ActivityScreen> {
-  // Slice 1: no server yet, so the default height and a fresh journey.
-  static const double _heightMetres = AppConfig.defaultHeightMetres;
+  // The journey resume point arrives with session plans in slice 3.
   static const double _resumeMetres = 0;
 
   late final ActivityController _controller;
@@ -26,10 +26,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
   @override
   void initState() {
     super.initState();
+    final heightMetres =
+        AppServices.instance.cache.heightMetres ??
+        AppConfig.defaultHeightMetres;
     _game = ParkGame(resumeMetres: _resumeMetres, signMetres: const [0]);
     _controller = ActivityController(
-      strideMetres: AppConfig.strideMetres(_heightMetres),
-      goalMetres: AppConfig.firstGoalMetres(_heightMetres),
+      strideMetres: AppConfig.strideMetres(heightMetres),
+      goalMetres: AppConfig.firstGoalMetres(heightMetres),
     )..addListener(_onActivityChanged);
     _controller.start();
   }

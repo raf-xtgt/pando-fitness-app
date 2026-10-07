@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
+import '../../services/app_services.dart';
 import '../../services/step_counter_service.dart';
 import '../activity/activity_screen.dart';
 
@@ -14,6 +17,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? _message;
+
+  @override
+  void initState() {
+    super.initState();
+    // Anything that couldn't be sent earlier gets another try.
+    unawaited(AppServices.instance.queue.flush());
+  }
 
   Future<void> _start() async {
     setState(() => _message = null);

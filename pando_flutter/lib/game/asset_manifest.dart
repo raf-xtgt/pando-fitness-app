@@ -77,4 +77,8 @@ abstract final class AssetManifest {
 
   // Wooden sign: a single 51x128 image, base at the bottom centre.
   static const String woodenSign = 'sign/wooden_sign.png';
+
+  // Lettering: made for Pando (not licensed art), so it's committed and
+  // lives outside the gitignored art folder. Full asset paths.
+  static const String wordmark = 'assets/lettering/pando_wordmark.svg';
 }

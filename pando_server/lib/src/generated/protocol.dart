@@ -17,8 +17,8 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
-import 'greetings/greeting.dart' as _izw8z7ou;
-export 'greetings/greeting.dart';
+import 'user_profile.dart' as _ir2mn8w1;
+export 'user_profile.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -28,6 +28,63 @@ class Protocol extends _is.DatabaseSerializationManager {
   static final Protocol _instance = Protocol._().._registerHostProtocols();
 
   static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
+      name: 'user_profile',
+      dartName: 'UserProfile',
+      schema: 'public',
+      module: 'pando',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'authUserId',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'heightM',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'fcmToken',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'user_profile_auth_user_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'authUserId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     ..._iais.Protocol.targetTableDefinitions,
     ..._iacs.Protocol.targetTableDefinitions,
     ..._isp.Protocol.targetTableDefinitions,
@@ -60,11 +117,11 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
-    if (t == _izw8z7ou.Greeting) {
-      return _izw8z7ou.Greeting.fromJson(data) as T;
+    if (t == _ir2mn8w1.UserProfile) {
+      return _ir2mn8w1.UserProfile.fromJson(data) as T;
     }
-    if (t == _is.getType<_izw8z7ou.Greeting?>()) {
-      return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    if (t == _is.getType<_ir2mn8w1.UserProfile?>()) {
+      return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
     }
     try {
       return _iais.Protocol().deserialize<T>(data, t);
@@ -80,7 +137,7 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _izw8z7ou.Greeting => 'Greeting',
+      _ir2mn8w1.UserProfile => 'UserProfile',
       _ => null,
     };
   }
@@ -95,8 +152,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
-      case _izw8z7ou.Greeting():
-        return 'Greeting';
+      case _ir2mn8w1.UserProfile():
+        return 'UserProfile';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -123,8 +180,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
-    if (dataClassName == 'Greeting') {
-      return deserialize<_izw8z7ou.Greeting>(data['data']);
+    if (dataClassName == 'UserProfile') {
+      return deserialize<_ir2mn8w1.UserProfile>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
@@ -165,6 +222,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       if (table != null) {
         return table;
       }
+    }
+    switch (t) {
+      case _ir2mn8w1.UserProfile:
+        return _ir2mn8w1.UserProfile.t;
     }
     return null;
   }

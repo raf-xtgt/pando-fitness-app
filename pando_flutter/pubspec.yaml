@@ -32,12 +32,15 @@ dependencies:
   flame_tiled: ^3.1.2
   flutter:
     sdk: flutter
+  flutter_svg: ^2.3.0
   pando_client:
     path: ../pando_client
   pedometer: ^4.2.0
   permission_handler: ^13.0.2
   serverpod_auth_idp_flutter: 4.0.3
   serverpod_flutter: 4.0.3
+  shared_preferences: ^2.5.6
+  uuid: ^4.6.0
 
 dev_dependencies:
   # Used for agents to drive the app through the Dart MCP
@@ -87,6 +90,7 @@ flutter:
     - assets/art/mascot/mascot_celebrate.png
     - assets/art/mascot/mascot_first_activity.png
     - assets/art/sign/wooden_sign.png
+    - assets/lettering/
 
   fonts:
     - family: Mulish

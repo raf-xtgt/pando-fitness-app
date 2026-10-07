@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- "Pando" grown from twigs, with a few leaves. Hand-written for Pando; swap freely. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 170" width="440" height="170">
+  <defs>
+    <!-- One leaf, pointing right from its stalk at (0,0). -->
+    <path id="leaf" d="M0,0 C5,-9 17,-11 24,-2 C17,6 6,7 0,0 Z"/>
+  </defs>
+
+  <!-- Twigs: ink, uneven, with knots and little offshoots. -->
+  <g fill="none" stroke="#2A2622" stroke-linecap="round" stroke-linejoin="round">
+    <!-- P -->
+    <path stroke-width="9" d="M42,148 C39,118 44,82 40,34"/>
+    <path stroke-width="7" d="M40,36 C72,22 104,36 100,62 C96,86 66,92 43,86"/>
+    <path stroke-width="3.5" d="M41,112 C34,108 28,101 24,94"/>
+    <path stroke-width="3" d="M98,50 C106,44 110,36 112,28"/>
+
+    <!-- a -->
+    <path stroke-width="7" d="M166,98 C148,78 120,86 120,116 C121,142 150,146 166,124"/>
+    <path stroke-width="8" d="M166,86 C163,108 165,128 171,148"/>
+    <path stroke-width="3" d="M168,96 C176,90 182,84 184,76"/>
+
+    <!-- n -->
+    <path stroke-width="8" d="M200,148 C202,124 199,104 200,86"/>
+    <path stroke-width="7" d="M201,106 C210,82 246,78 248,108 C250,124 247,136 251,148"/>
+
+    <!-- d -->
+    <path stroke-width="7" d="M330,100 C310,80 280,88 282,116 C284,142 314,146 330,126"/>
+    <path stroke-width="9" d="M332,26 C328,70 333,110 337,148"/>
+    <path stroke-width="3.5" d="M331,52 C322,46 318,38 318,30"/>
+
+    <!-- o -->
+    <path stroke-width="7" d="M392,86 C362,84 356,142 390,146 C424,148 426,90 394,86"/>
+    <path stroke-width="3" d="M394,86 C398,78 404,72 412,70"/>
+  </g>
+
+  <!-- Leaves: leaf green, a few, not a hedge. -->
+  <g fill="#6B8F4E" stroke="#2A2622" stroke-width="1.6" stroke-linejoin="round">
+    <use href="#leaf" transform="translate(24,94) rotate(-140)"/>
+    <use href="#leaf" transform="translate(112,28) rotate(-60)"/>
+    <use href="#leaf" transform="translate(112,28) rotate(-5) scale(0.8)"/>
+    <use href="#leaf" transform="translate(184,76) rotate(-75) scale(0.9)"/>
+    <use href="#leaf" transform="translate(318,30) rotate(-110)"/>
+    <use href="#leaf" transform="translate(333,26) rotate(-40) scale(0.85)"/>
+    <use href="#leaf" transform="translate(412,70) rotate(-20)"/>
+  </g>
+</svg>

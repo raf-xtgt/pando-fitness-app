@@ -1,0 +1,15 @@
+### One person's Pando profile, tied to their anonymous sign-in.
+class: UserProfile
+table: user_profile
+fields:
+  ### The anonymous auth user this profile belongs to (one phone = one user).
+  authUserId: UuidValue
+  ### Height in metres; null until onboarding is done.
+  heightM: double?
+  ### Firebase Cloud Messaging token for the delayed report (slice 4).
+  fcmToken: String?
+  createdAt: DateTime, default=now
+indexes:
+  user_profile_auth_user_idx:
+    fields: authUserId
+    unique: true

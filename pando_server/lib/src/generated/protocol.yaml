@@ -1,13 +1,7 @@
-emailIdp:
+anonymousIdp:
   - login:
-  - startRegistration:
-  - verifyRegistrationCode:
-  - finishRegistration:
-  - startPasswordReset:
-  - verifyPasswordResetCode:
-  - finishPasswordReset:
-  - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
-greeting:
-  - hello:
+profile:
+  - get:
+  - saveHeight:
