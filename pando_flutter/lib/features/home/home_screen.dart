@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:pando_client/pando_client.dart';
 
+import '../../app/config.dart';
 import '../../app/theme.dart';
 import '../../services/app_services.dart';
 import '../../services/step_counter_service.dart';
@@ -81,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _start() async {
     setState(() => _message = null);
     if (_services.cache.plan == null) await _refresh();
-    final plan = _services.cache.plan;
+    final plan = _withTestGoal(_services.cache.plan);
     if (plan == null) {
       setState(
         () => _message =
@@ -115,6 +117,31 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
     if (mounted) setState(() => _rows = _buildRows());
+  }
+
+  /// `TEST_GOAL_STEPS` (testing only) swaps in a tiny goal.
+  static ActivityPlan? _withTestGoal(ActivityPlan? plan) {
+    const steps = AppConfig.testGoalSteps;
+    if (plan == null || steps <= 0) return plan;
+    return plan.copyWith(goalSteps: steps, goalM: steps * plan.strideM);
+  }
+
+  /// Demo builds: long-press "Your walks" to add three past walks.
+  Future<void> _seedDemo() async {
+    setState(() => _message = 'Adding three demo walks…');
+    try {
+      await _services.api.seedDemoSessions();
+      setState(() => _message = null);
+      await _refresh();
+    } catch (e) {
+      debugPrint('Pando demo seed failed: $e');
+      if (mounted) {
+        setState(
+          () => _message =
+              'Demo walks need a fresh profile and a server that allows them.',
+        );
+      }
+    }
   }
 
   @override
@@ -165,11 +192,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: text.bodyLarge,
                 ),
               ],
-              if (_rows.isNotEmpty) ...[
+              // Demo builds always show the header, so it can be long-pressed.
+              if (_rows.isNotEmpty || AppConfig.isDemo) ...[
                 const SizedBox(height: 36),
-                Text(
-                  'Your walks',
-                  style: text.titleLarge!.copyWith(fontWeight: FontWeight.w700),
+                GestureDetector(
+                  onLongPress: AppConfig.isDemo ? _seedDemo : null,
+                  child: Text(
+                    'Your walks',
+                    style: text.titleLarge!.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 4),
                 for (final row in _rows) ...[

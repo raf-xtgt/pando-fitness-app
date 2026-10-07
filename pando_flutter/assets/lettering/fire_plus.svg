@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" width="60" height="100">
+  <!-- Pando fire glyph "plus" (hand-made for Pando; swap freely) -->
+  <path d="M30 44 C24 38.5 26.4 30.8 30 22 C33.6 30.8 36 38.5 30 44 Z" fill="#E2582B" stroke="#C2401A" stroke-width="1.5" stroke-linejoin="round"/><path d="M30 43 C27 39.975 28.2 35.74 30 30.9 C31.8 35.74 33 39.975 30 43 Z" fill="#F6B53A"/>
+  <path d="M30 46 L30 82 M12 64 L48 64" fill="none" stroke="#C2401A" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 46 L30 82 M12 64 L48 64" fill="none" stroke="#E2582B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 46 L30 82 M12 64 L48 64" fill="none" stroke="#F6B53A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

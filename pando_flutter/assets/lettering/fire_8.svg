@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100" width="60" height="100">
+  <!-- Pando fire glyph "8" (hand-made for Pando; swap freely) -->
+  <path d="M24 32 C18 27.5 20.4 21.200000000000003 24 14 C27.6 21.200000000000003 30 27.5 24 32 Z" fill="#E2582B" stroke="#C2401A" stroke-width="1.5" stroke-linejoin="round"/><path d="M24 31 C21 28.525 22.2 25.06 24 21.1 C25.8 25.06 27 28.525 24 31 Z" fill="#F6B53A"/><path d="M36 31 C30 24.5 32.4 15.4 36 5 C39.6 15.4 42 24.5 36 31 Z" fill="#E2582B" stroke="#C2401A" stroke-width="1.5" stroke-linejoin="round"/><path d="M36 30 C33 26.425 34.2 21.42 36 15.7 C37.8 21.42 39 26.425 36 30 Z" fill="#F6B53A"/>
+  <path d="M30 58 C14 58 14 30 30 30 C46 30 46 58 30 58 C10 58 10 90 30 90 C50 90 50 58 30 58 Z" fill="none" stroke="#C2401A" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 58 C14 58 14 30 30 30 C46 30 46 58 30 58 C10 58 10 90 30 90 C50 90 50 58 30 58 Z" fill="none" stroke="#E2582B" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 58 C14 58 14 30 30 30 C46 30 46 58 30 58 C10 58 10 90 30 90 C50 90 50 58 30 58 Z" fill="none" stroke="#F6B53A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

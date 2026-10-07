@@ -15,5 +15,9 @@ abstract final class PandoServices {
 
   static PushSender push = LogPushSender(print);
 
+  /// `demo.seedThreeSessions` only works when this is on (`allowDemoSeed`
+  /// in `config/<run mode>.yaml`).
+  static bool allowDemoSeed = false;
+
   static ReportBuilder get reportBuilder => ReportBuilder(messageSource);
 }

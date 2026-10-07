@@ -11,6 +11,7 @@ import '../../services/pending_queue.dart';
 import 'activity_controller.dart';
 import 'distance_display.dart';
 import 'feel_question.dart';
+import 'mascot_bubble.dart';
 
 /// The park map with Flutter overlays on top. Owns the [ActivityController]
 /// and tells the game what to show; the game never sees steps.
@@ -45,6 +46,9 @@ class _ActivityScreenState extends State<ActivityScreen> {
       goalMetres: _plan.goalM,
     )..addListener(_onActivityChanged);
     _controller.start();
+    if (_plan.isFirstActivity) {
+      unawaited(_game.playMascot(MascotMove.firstActivity));
+    }
   }
 
   void _onActivityChanged() {
@@ -53,9 +57,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
       ..setGait(_controller.gait);
   }
 
-  void _stop() {
+  Future<void> _stop() async {
     _controller.stop();
     _game.placeSign(_plan.resumeMetres + _controller.metres);
+    if (_controller.state == ActivityState.celebrating) {
+      await _game.playMascot(MascotMove.celebrate);
+      _controller.celebrationDone();
+    }
   }
 
   /// Saves on the phone first, queues the server save, and goes Home.
@@ -78,6 +86,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
       _plan.copyWith(
         resumeMetres: endMetres,
         signMetres: [..._plan.signMetres, endMetres],
+        isFirstActivity: false,
       ),
     );
     unawaited(
@@ -111,7 +120,16 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     const SizedBox(height: 12),
                     DistanceDisplay(
                       remainingMetres: _controller.remainingMetres,
+                      extraMetres: _controller.extraMetres,
+                      goalMet: _controller.goalMet,
                     ),
+                    if (_bubbleText case final text?) ...[
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: MascotBubble(text),
+                      ),
+                    ],
                     const Spacer(),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
@@ -126,6 +144,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
       ),
     );
   }
+
+  /// The greeting until the first steps; the cheer while celebrating.
+  String? get _bubbleText => switch (_controller.state) {
+    ActivityState.ready => MascotBubble.greeting,
+    ActivityState.celebrating => MascotBubble.celebration,
+    _ => null,
+  };
 
   Widget _bottom() {
     if (_controller.state.isLive) {

@@ -8,3 +8,5 @@ fields:
   resumeMetres: double
   ### Journey positions of every wooden sign: the start (0) and each session's end.
   signMetres: List<double>
+  ### No real (non-seeded) sessions yet: the map plays the first-activity animation.
+  isFirstActivity: bool, default=false

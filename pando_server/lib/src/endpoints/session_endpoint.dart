@@ -31,6 +31,7 @@ class SessionEndpoint extends Endpoint {
       strideM: stride,
       resumeMetres: history.isEmpty ? 0 : history.first.endPathM,
       signMetres: [0, for (final s in history.reversed) s.endPathM],
+      isFirstActivity: history.every((s) => s.isSeeded),
     );
   }
 

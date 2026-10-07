@@ -7,12 +7,14 @@ import '../../domain/gait_detector.dart';
 import '../../domain/passive_signals.dart';
 import '../../services/step_counter_service.dart';
 
-/// Where the activity is: `ready → moving ↔ standing → asking → done`.
-/// Slice 5 adds `celebrating` between Stop and the question.
+/// Where the activity is:
+/// `ready → moving ↔ standing → celebrating? → asking → done`.
+/// `celebrating` only happens when the goal was met.
 enum ActivityState {
   ready,
   moving,
   standing,
+  celebrating,
   asking,
   done;
 
@@ -54,8 +56,10 @@ class ActivityController extends ChangeNotifier {
   /// Distance covered this session.
   double get metres => steps * strideMetres;
 
-  /// Never below zero; going past the goal is shown differently (slice 5).
+  /// Never below zero; past the goal, [extraMetres] counts up instead.
   double get remainingMetres => math.max(0, goalMetres - metres);
+
+  double get extraMetres => math.max(0, metres - goalMetres);
 
   bool get goalMet => metres >= goalMetres;
 
@@ -66,7 +70,8 @@ class ActivityController extends ChangeNotifier {
     _ticker = Timer.periodic(gaitTick, (_) => _evaluate());
   }
 
-  /// Ends step counting and works out the passive signals.
+  /// Ends step counting and works out the passive signals. A met goal
+  /// gets the celebration first; [celebrationDone] then asks the question.
   void stop() {
     if (!state.isLive) return;
     _ticker?.cancel();
@@ -78,6 +83,12 @@ class ActivityController extends ChangeNotifier {
       goalMet: goalMet,
     );
     gait = Gait.standing;
+    state = goalMet ? ActivityState.celebrating : ActivityState.asking;
+    notifyListeners();
+  }
+
+  void celebrationDone() {
+    if (state != ActivityState.celebrating) return;
     state = ActivityState.asking;
     notifyListeners();
   }

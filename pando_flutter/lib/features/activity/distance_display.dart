@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
+import 'fire_text.dart';
 
-/// "Remaining XYZ m till the goal", rounded to whole metres.
+/// "Remaining XYZ m till the goal", rounded to whole metres. Past the goal
+/// it turns into the extra distance in fire lettering, e.g. `+42 m`.
 class DistanceDisplay extends StatelessWidget {
-  const DistanceDisplay({super.key, required this.remainingMetres});
+  const DistanceDisplay({
+    super.key,
+    required this.remainingMetres,
+    required this.extraMetres,
+    required this.goalMet,
+  });
 
   final double remainingMetres;
+  final double extraMetres;
+  final bool goalMet;
 
   @override
   Widget build(BuildContext context) {
+    if (goalMet) return FireText('+${extraMetres.round()} m');
+
     final style = Theme.of(context).textTheme.titleMedium!.copyWith(
       fontWeight: FontWeight.w600,
     );

@@ -19,6 +19,7 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import '../auth/anonymous_idp_endpoint.dart' as _in0zita6;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
+import '../endpoints/demo_endpoint.dart' as _irow5ity;
 import '../endpoints/profile_endpoint.dart' as _i2cx2pww;
 import '../endpoints/session_endpoint.dart' as _ih5ivktc;
 export 'future_calls.dart' show ServerpodFutureCallsGetter;
@@ -37,6 +38,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'jwtRefresh',
+          null,
+        ),
+      'demo': _irow5ity.DemoEndpoint()
+        ..initialize(
+          server,
+          'demo',
           null,
         ),
       'profile': _i2cx2pww.ProfileEndpoint()
@@ -101,6 +108,22 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         refreshToken: params['refreshToken'],
                       ),
+        ),
+      },
+    );
+    connectors['demo'] = _is.EndpointConnector(
+      name: 'demo',
+      endpoint: endpoints['demo']!,
+      methodConnectors: {
+        'seedThreeSessions': _is.MethodConnector(
+          name: 'seedThreeSessions',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['demo'] as _irow5ity.DemoEndpoint)
+                  .seedThreeSessions(session),
         ),
       },
     );

@@ -6,6 +6,10 @@ abstract final class AppConfig {
   /// Demo builds (`--dart-define=DEMO=true`) can seed past sessions.
   static const bool isDemo = bool.fromEnvironment('DEMO');
 
+  /// Testing only (`--dart-define=TEST_GOAL_STEPS=30`): replaces the goal,
+  /// so going past it and the celebration can be tried indoors. 0 = off.
+  static const int testGoalSteps = int.fromEnvironment('TEST_GOAL_STEPS');
+
   /// Used until the user's real height is known.
   static const double defaultHeightMetres = 1.70;
 

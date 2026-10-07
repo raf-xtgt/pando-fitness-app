@@ -61,3 +61,6 @@ sessionLogs:
 #  #sameSite: lax # Defaults to "lax", options are "strict" or "none"
 #allowedOrigins:
 #  - http://localhost:8082 # The origin serving your Flutter web app
+
+# Pando: allow demo.seedThreeSessions (demo builds seed three past walks).
+allowDemoSeed: true

@@ -87,6 +87,26 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// Demo-only history, so the demo shows a goal that grows from past walks.
+/// Refused unless `allowDemoSeed` is on in the server config.
+/// {@category Endpoint}
+class EndpointDemo extends _isc.EndpointRef {
+  EndpointDemo(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'demo';
+
+  /// Adds three past walks over the previous week, chained along the path
+  /// like real ones. Only for a fresh profile (no sessions yet), so seeded
+  /// and real walks never overlap on the map.
+  _ida.Future<List<_itsbeekw.ActivitySession>> seedThreeSessions() =>
+      caller.callServerEndpoint<List<_itsbeekw.ActivitySession>>(
+        'demo',
+        'seedThreeSessions',
+        {},
+      );
+}
+
 /// The caller's own profile. Every call is scoped to the signed-in user.
 /// {@category Endpoint}
 class EndpointProfile extends _isc.EndpointRef {
@@ -203,6 +223,7 @@ class Client extends _isc.ServerpodClientShared {
        ) {
     anonymousIdp = EndpointAnonymousIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    demo = EndpointDemo(this);
     profile = EndpointProfile(this);
     session = EndpointSession(this);
     modules = Modules(this);
@@ -211,6 +232,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointAnonymousIdp anonymousIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointDemo demo;
 
   late final EndpointProfile profile;
 
@@ -222,6 +245,7 @@ class Client extends _isc.ServerpodClientShared {
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
     'anonymousIdp': anonymousIdp,
     'jwtRefresh': jwtRefresh,
+    'demo': demo,
     'profile': profile,
     'session': session,
   };

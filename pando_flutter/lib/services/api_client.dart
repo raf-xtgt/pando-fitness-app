@@ -65,4 +65,10 @@ class ApiClient {
     await ensureSignedIn();
     return _client.session.report(sessionId);
   }
+
+  /// Demo builds only: adds three past walks (the server must allow it).
+  Future<void> seedDemoSessions() async {
+    await ensureSignedIn();
+    await _client.demo.seedThreeSessions();
+  }
 }

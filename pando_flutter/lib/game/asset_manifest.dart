@@ -75,10 +75,32 @@ abstract final class AssetManifest {
     fps: 8,
   );
 
+  // Played once, then back to hover (see mascot/SHEETS.md).
+  static const SheetSpec mascotCelebrate = SheetSpec(
+    file: 'mascot/mascot_celebrate.png',
+    frameWidth: 96,
+    frameHeight: 96,
+    frames: 12,
+    fps: 12,
+    loop: false,
+  );
+  static const SheetSpec mascotFirstActivity = SheetSpec(
+    file: 'mascot/mascot_first_activity.png',
+    frameWidth: 96,
+    frameHeight: 96,
+    frames: 20,
+    fps: 8,
+    loop: false,
+  );
+
   // Wooden sign: a single 51x128 image, base at the bottom centre.
   static const String woodenSign = 'sign/wooden_sign.png';
 
   // Lettering: made for Pando (not licensed art), so it's committed and
   // lives outside the gitignored art folder. Full asset paths.
   static const String wordmark = 'assets/lettering/pando_wordmark.svg';
+
+  /// One fire glyph per character of `+123 m`: digits, `m` and `plus`.
+  static String fireGlyph(String char) =>
+      'assets/lettering/fire_${char == '+' ? 'plus' : char}.svg';
 }

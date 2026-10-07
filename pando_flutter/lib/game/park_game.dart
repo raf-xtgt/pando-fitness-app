@@ -14,9 +14,11 @@ import 'components/runner.dart';
 import 'components/wooden_sign.dart';
 import 'park_path.dart';
 
+export 'components/mascot.dart' show MascotMove;
+
 /// The isometric park. This is the map boundary: the Activity screen only
-/// talks to the game through [setDistance], [setGait] and [placeSign]
-/// (plus the start values passed in). The game knows nothing about steps or
+/// talks to the game through [setDistance], [setGait], [placeSign] and
+/// [playMascot] (plus the start values passed in). The game knows nothing about steps or
 /// the server.
 class ParkGame extends FlameGame {
   ParkGame({this.resumeMetres = 0, this.signMetres = const [0]});
@@ -37,6 +39,7 @@ class ParkGame extends FlameGame {
   late final RenderableTiledMap _map;
   late final ParkPath _path;
   late final Runner _runner;
+  late final Mascot _mascot;
   final Map<int, ParkSegment> _segments = {};
 
   @override
@@ -61,12 +64,14 @@ class ParkGame extends FlameGame {
     final startPixels = resumeMetres * pixelsPerMetre;
     _runner = Runner(path: _path, startPixels: startPixels);
 
+    _mascot = Mascot(path: _path, runner: _runner);
+
     _updateSegments();
     await world.addAll([
       for (final m in signMetres)
         WoodenSign(path: _path, atPixels: m * pixelsPerMetre),
       _runner,
-      Mascot(path: _path, runner: _runner),
+      _mascot,
     ]);
 
     camera.viewfinder.anchor = const Anchor(0.5, 0.58);
@@ -94,6 +99,14 @@ class ParkGame extends FlameGame {
   void placeSign(double pathMetres) {
     if (!isLoaded) return;
     world.add(WoodenSign(path: _path, atPixels: pathMetres * pixelsPerMetre));
+  }
+
+  /// Plays a mascot move once (celebrate, first activity). Waits for the
+  /// map to load first; completes when the move has finished.
+  Future<void> playMascot(MascotMove move) async {
+    await loaded;
+    await _mascot.loaded;
+    await _mascot.play(move);
   }
 
   @override

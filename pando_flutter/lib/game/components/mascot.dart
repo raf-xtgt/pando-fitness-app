@@ -6,11 +6,20 @@ import '../asset_manifest.dart';
 import '../park_path.dart';
 import 'runner.dart';
 
+/// What the mascot is doing. [celebrate] and [firstActivity] play once,
+/// then it goes back to [hover].
+enum MascotMove { hover, celebrate, firstActivity }
+
 /// The small winged companion. Hovers with a gentle bob and trails the
 /// runner by a fixed distance along the path.
-class Mascot extends SpriteAnimationComponent with HasGameReference {
+class Mascot extends SpriteAnimationGroupComponent<MascotMove>
+    with HasGameReference {
   Mascot({required this.path, required this.runner})
-    : super(anchor: Anchor.bottomCenter, priority: 1000001);
+    : super(
+        anchor: Anchor.bottomCenter,
+        priority: 1000001,
+        current: MascotMove.hover,
+      );
 
   /// How far behind the runner the mascot flies, in path pixels.
   static const double trailPixels = 110;
@@ -27,17 +36,34 @@ class Mascot extends SpriteAnimationComponent with HasGameReference {
 
   @override
   Future<void> onLoad() async {
+    Future<SpriteAnimation> load(SheetSpec spec) async =>
+        SpriteAnimation.fromFrameData(
+          await game.images.load(spec.file),
+          SpriteAnimationData.sequenced(
+            amount: spec.frames,
+            stepTime: spec.stepTime,
+            textureSize: Vector2(spec.frameWidth, spec.frameHeight),
+            loop: spec.loop,
+          ),
+        );
+
+    animations = {
+      MascotMove.hover: await load(AssetManifest.mascotHover),
+      MascotMove.celebrate: await load(AssetManifest.mascotCelebrate),
+      MascotMove.firstActivity: await load(AssetManifest.mascotFirstActivity),
+    };
     const spec = AssetManifest.mascotHover;
-    animation = SpriteAnimation.fromFrameData(
-      await game.images.load(spec.file),
-      SpriteAnimationData.sequenced(
-        amount: spec.frames,
-        stepTime: spec.stepTime,
-        textureSize: Vector2(spec.frameWidth, spec.frameHeight),
-      ),
-    );
     size = Vector2(spec.frameWidth, spec.frameHeight);
     _place();
+  }
+
+  /// Plays a one-off move from its first frame, then returns to hover.
+  /// Completes when the move has finished.
+  Future<void> play(MascotMove move) async {
+    current = move;
+    if (move == MascotMove.hover) return;
+    await animationTicker!.completed;
+    if (current == move) current = MascotMove.hover;
   }
 
   @override

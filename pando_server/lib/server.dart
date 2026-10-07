@@ -4,6 +4,8 @@ import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'dart:io';
 
+import 'package:yaml/yaml.dart';
+
 import 'src/generated/serverpod.dart';
 import 'src/notifications/fcm_sender.dart';
 import 'src/pando_services.dart';
@@ -45,6 +47,7 @@ void run(List<String> args) async {
   );
 
   await _setUpReports();
+  _readPandoConfig(pod);
 
   // Start the server.
   await pod.start();
@@ -60,4 +63,15 @@ Future<void> _setUpReports() async {
   } else {
     stdout.writeln('Report push: no $keyFile, pushes are only logged');
   }
+}
+
+/// Pando's own settings in `config/<run mode>.yaml` (Serverpod ignores
+/// keys it doesn't know).
+void _readPandoConfig(Serverpod pod) {
+  final file = File('config/${pod.runMode}.yaml');
+  if (!file.existsSync()) return;
+  final yaml = loadYaml(file.readAsStringSync());
+  PandoServices.allowDemoSeed =
+      yaml is YamlMap && yaml['allowDemoSeed'] == true;
+  stdout.writeln('Demo seed: ${PandoServices.allowDemoSeed ? 'on' : 'off'}');
 }

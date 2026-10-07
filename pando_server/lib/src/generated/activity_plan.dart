@@ -22,7 +22,8 @@ abstract class ActivityPlan
     required this.strideM,
     required this.resumeMetres,
     required this.signMetres,
-  });
+    bool? isFirstActivity,
+  }) : isFirstActivity = isFirstActivity ?? false;
 
   factory ActivityPlan({
     required int goalSteps,
@@ -30,6 +31,7 @@ abstract class ActivityPlan
     required double strideM,
     required double resumeMetres,
     required List<double> signMetres,
+    bool? isFirstActivity,
   }) = _ActivityPlanImpl;
 
   factory ActivityPlan.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -41,6 +43,11 @@ abstract class ActivityPlan
       signMetres: _iteljug8.Protocol().deserialize<List<double>>(
         jsonSerialization['signMetres'],
       ),
+      isFirstActivity: jsonSerialization['isFirstActivity'] == null
+          ? null
+          : _is.BoolJsonExtension.fromJson(
+              jsonSerialization['isFirstActivity'],
+            ),
     );
   }
 
@@ -56,6 +63,9 @@ abstract class ActivityPlan
   /// Journey positions of every wooden sign: the start (0) and each session's end.
   List<double> signMetres;
 
+  /// No real (non-seeded) sessions yet: the map plays the first-activity animation.
+  bool isFirstActivity;
+
   /// Returns a shallow copy of this [ActivityPlan]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
@@ -65,6 +75,7 @@ abstract class ActivityPlan
     double? strideM,
     double? resumeMetres,
     List<double>? signMetres,
+    bool? isFirstActivity,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -75,6 +86,7 @@ abstract class ActivityPlan
       'strideM': strideM,
       'resumeMetres': resumeMetres,
       'signMetres': signMetres.toJson(),
+      'isFirstActivity': isFirstActivity,
     };
   }
 
@@ -87,6 +99,7 @@ abstract class ActivityPlan
       'strideM': strideM,
       'resumeMetres': resumeMetres,
       'signMetres': signMetres.toJson(),
+      'isFirstActivity': isFirstActivity,
     };
   }
 
@@ -103,12 +116,14 @@ class _ActivityPlanImpl extends ActivityPlan {
     required double strideM,
     required double resumeMetres,
     required List<double> signMetres,
+    bool? isFirstActivity,
   }) : super._(
          goalSteps: goalSteps,
          goalM: goalM,
          strideM: strideM,
          resumeMetres: resumeMetres,
          signMetres: signMetres,
+         isFirstActivity: isFirstActivity,
        );
 
   /// Returns a shallow copy of this [ActivityPlan]
@@ -121,6 +136,7 @@ class _ActivityPlanImpl extends ActivityPlan {
     double? strideM,
     double? resumeMetres,
     List<double>? signMetres,
+    bool? isFirstActivity,
   }) {
     return ActivityPlan(
       goalSteps: goalSteps ?? this.goalSteps,
@@ -128,6 +144,7 @@ class _ActivityPlanImpl extends ActivityPlan {
       strideM: strideM ?? this.strideM,
       resumeMetres: resumeMetres ?? this.resumeMetres,
       signMetres: signMetres ?? this.signMetres.map((e0) => e0).toList(),
+      isFirstActivity: isFirstActivity ?? this.isFirstActivity,
     );
   }
 }
