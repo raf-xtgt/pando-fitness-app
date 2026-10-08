@@ -27,8 +27,9 @@ class ParkGame extends FlameGame {
   /// crosses roughly two copies of the park.
   static const double pixelsPerMetre = 7.8;
 
-  /// Tunable: how many map pixels fit across the phone's width.
-  static const double visibleWorldWidth = 820;
+  /// Tunable: how many map pixels fit across the phone's width. At 700 the
+  /// view stays on the park; the street rows around it fill the corners.
+  static const double visibleWorldWidth = 700;
 
   /// Where along the journey this session starts.
   final double resumeMetres;
@@ -54,10 +55,12 @@ class ParkGame extends FlameGame {
       Vector2(256, 128),
       prefix: AssetManifest.parkFolder,
       images: Images(prefix: AssetManifest.parkFolder),
-      // Only the ground tileset goes into the atlas; park objects are drawn
-      // by ParkSegment (their tileset points outside the park folder).
+      // Only the ground tilesets (park and street) go into the atlas; park
+      // objects are drawn by ParkSegment (their tileset points outside the
+      // park folder).
       tsxPackingFilter: (tileset) =>
-          tileset.name == AssetManifest.parkTilesetName,
+          tileset.name == AssetManifest.parkTilesetName ||
+          tileset.name == AssetManifest.streetTilesetName,
     );
     _path = _readPath(_map);
 

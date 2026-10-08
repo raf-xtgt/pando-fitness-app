@@ -7,8 +7,9 @@ import '../asset_manifest.dart';
 
 /// One copy of the park map, drawn at copy [index] along the endless path.
 ///
-/// The ground comes from flame_tiled. Park objects (trees, bushes, pond,
-/// benches, rocks) are drawn here from the map's `objects` layer, because
+/// The ground (park, and the street rows around it) comes from flame_tiled.
+/// Map objects (trees, bushes, pond, benches, rocks, fence, street
+/// furniture) are drawn here from the map's `objects` layer, because
 /// flame_tiled 3.x doesn't render tile objects itself. Objects are
 /// depth-sorted by their base, so nearer things overlap farther ones.
 class ParkSegment extends PositionComponent with HasGameReference {

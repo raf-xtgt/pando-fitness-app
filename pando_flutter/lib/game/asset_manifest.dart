@@ -34,6 +34,7 @@ abstract final class AssetManifest {
   static const String parkFolder = 'assets/art/park/';
   static const String parkMap = 'park.tmx';
   static const String parkTilesetName = 'park_tiles';
+  static const String streetTilesetName = 'street_tiles';
   static const String parkObjectsFolder = 'park/';
   static const String objectsLayer = 'objects';
   static const String pathLayer = 'path';

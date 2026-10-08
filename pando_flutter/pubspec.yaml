@@ -83,7 +83,9 @@ flutter:
     - assets/art/park/park.tmx
     - assets/art/park/park_tiles.tsx
     - assets/art/park/park_objects.tsx
+    - assets/art/park/street_tiles.tsx
     - assets/art/park/tiles/park_tiles.png
+    - assets/art/park/tiles/street_tiles.png
     - assets/art/park/objects/
     - assets/art/runner/runner_idle.png
     - assets/art/runner/runner_walk.png
