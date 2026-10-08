@@ -6,11 +6,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../game/asset_manifest.dart';
 import '../../services/app_services.dart';
 import '../home/home_screen.dart';
+import '../mascot/floating_mascot.dart';
 import '../onboarding/height_screen.dart';
 
-/// Wordmark and welcome while startup runs: sign in, send anything queued,
-/// fetch the profile. Then Home, or Height on first launch. If the server
-/// can't be reached, the cached profile decides.
+/// Wordmark, floating mascot and welcome while startup runs: sign in, send
+/// anything queued, fetch the profile. Then Home, or Height on first
+/// launch. If the server can't be reached, the cached profile decides.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -60,8 +61,11 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SvgPicture.asset(AssetManifest.wordmark, width: 260),
-                const SizedBox(height: 20),
+                // The mascot is the focus: its visible body (~230 px of the
+                // 280 px box) is wider than the wordmark.
+                SvgPicture.asset(AssetManifest.wordmark, width: 200),
+                const FloatingMascot(size: 280),
+                const SizedBox(height: 8),
                 Text(
                   'Your pace, your path.\nEvery step counts here.',
                   textAlign: TextAlign.center,

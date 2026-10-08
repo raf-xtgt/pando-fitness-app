@@ -94,6 +94,11 @@ abstract final class AssetManifest {
     loop: false,
   );
 
+  // Mascot still: a sharp 512x512 front view for Flutter screens (splash,
+  // celebrations), where the 96 px sheet frames would look soft. Full
+  // asset path (Flutter's Image.asset, not the game's image cache).
+  static const String mascotStill = 'assets/art/mascot/mascot_still.png';
+
   // Wooden sign: a single 51x128 image, base at the bottom centre.
   static const String woodenSign = 'sign/wooden_sign.png';
 
