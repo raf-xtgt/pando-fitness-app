@@ -98,6 +98,10 @@ abstract final class AssetManifest {
   // celebrations), where the 96 px sheet frames would look soft. Full
   // asset path (Flutter's Image.asset, not the game's image cache).
   static const String mascotStill = 'assets/art/mascot/mascot_still.png';
+  static const String mascotStillTalk =
+      'assets/art/mascot/mascot_still_talk.png';
+  static const String mascotStillCelebrate =
+      'assets/art/mascot/mascot_still_celebrate.png';
 
   // Wooden sign: a single 51x128 image, base at the bottom centre.
   static const String woodenSign = 'sign/wooden_sign.png';

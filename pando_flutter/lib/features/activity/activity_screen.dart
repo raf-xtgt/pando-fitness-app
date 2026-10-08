@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 
 import '../../app/theme.dart';
+import '../../game/asset_manifest.dart';
 import '../../game/park_game.dart';
 import '../../services/app_services.dart';
 import '../../services/pending_queue.dart';
+import '../celebration/celebration_overlay.dart';
 import 'activity_controller.dart';
 import 'distance_display.dart';
 import 'feel_question.dart';
+import 'fire_text.dart';
 import 'mascot_bubble.dart';
 
 /// The park map with Flutter overlays on top. Owns the [ActivityController]
@@ -46,8 +49,24 @@ class _ActivityScreenState extends State<ActivityScreen> {
       goalMetres: _plan.goalM,
     )..addListener(_onActivityChanged);
     _controller.start();
+    // Only the very first real walk. Steps already count underneath.
     if (_plan.isFirstActivity) {
-      unawaited(_game.playMascot(MascotMove.firstActivity));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        unawaited(
+          CelebrationOverlay.show(
+            context,
+            // Seen once, so longer and calm: only the floating mascot.
+            const CelebrationOverlay(
+              image: AssetManifest.mascotStillTalk,
+              title: "We're about to start a new journey.",
+              subtitle: "Every step counts. Let's go!",
+              duration: Duration(seconds: 5),
+              festive: false,
+            ),
+          ),
+        );
+      });
     }
   }
 
@@ -61,7 +80,19 @@ class _ActivityScreenState extends State<ActivityScreen> {
     _controller.stop();
     _game.placeSign(_plan.resumeMetres + _controller.metres);
     if (_controller.state == ActivityState.celebrating) {
-      await _game.playMascot(MascotMove.celebrate);
+      await CelebrationOverlay.show(
+        context,
+        CelebrationOverlay(
+          image: AssetManifest.mascotStillCelebrate,
+          title: 'You beat your goal!',
+          highlight: FireText(
+            '+${_controller.extraMetres.round()} m',
+            height: 64,
+          ),
+          subtitle: "That's extra distance, all yours.",
+        ),
+      );
+      if (!mounted) return;
       _controller.celebrationDone();
     }
   }
@@ -145,10 +176,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
     );
   }
 
-  /// The greeting until the first steps; the cheer while celebrating.
+  /// The greeting until the first steps. (The goal cheer is the
+  /// full-screen celebration.)
   String? get _bubbleText => switch (_controller.state) {
     ActivityState.ready => MascotBubble.greeting,
-    ActivityState.celebrating => MascotBubble.celebration,
     _ => null,
   };
 

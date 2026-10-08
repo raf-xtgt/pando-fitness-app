@@ -14,12 +14,16 @@ class FloatingMascot extends StatefulWidget {
   const FloatingMascot({
     super.key,
     this.size = 280,
+    this.image = AssetManifest.mascotStill,
     this.lift = 0.04,
     this.sway = 0.035,
   });
 
   /// Width and height of the square image box.
   final double size;
+
+  /// Which 512 px still to show (`AssetManifest.mascotStill*`).
+  final String image;
 
   /// Float height, as a fraction of [size] (up and down).
   final double lift;
@@ -60,7 +64,7 @@ class _FloatingMascotState extends State<FloatingMascot>
   @override
   Widget build(BuildContext context) {
     final image = Image.asset(
-      AssetManifest.mascotStill,
+      widget.image,
       width: widget.size,
       height: widget.size,
       filterQuality: FilterQuality.medium,

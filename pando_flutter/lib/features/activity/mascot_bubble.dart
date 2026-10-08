@@ -8,7 +8,6 @@ class MascotBubble extends StatelessWidget {
 
   static const String greeting =
       "Just start walking or running, we'll take it from here.";
-  static const String celebration = 'You beat your goal! Wonderful!';
 
   final String text;
 
