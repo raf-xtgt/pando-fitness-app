@@ -6,14 +6,26 @@ import '../../game/asset_manifest.dart';
 
 /// The mascot's sharp still, floating: a slow up-and-down drift plus a
 /// small side-to-side sway, like it holds itself up with its wings.
-/// Used on the splash; reusable on any Flutter screen.
+/// Used on the splash (full motion) and as the height marker (small
+/// motion, so the measurement still reads as exact).
 ///
 /// With the system's "remove animations" setting on, it stands still.
 class FloatingMascot extends StatefulWidget {
-  const FloatingMascot({super.key, this.size = 280});
+  const FloatingMascot({
+    super.key,
+    this.size = 280,
+    this.lift = 0.04,
+    this.sway = 0.035,
+  });
 
   /// Width and height of the square image box.
   final double size;
+
+  /// Float height, as a fraction of [size] (up and down).
+  final double lift;
+
+  /// Sway angle in radians (side to side).
+  final double sway;
 
   /// Tunable: one full float cycle. The sway runs twice per cycle.
   static const Duration period = Duration(milliseconds: 2800);
@@ -61,11 +73,10 @@ class _FloatingMascotState extends State<FloatingMascot>
       child: image,
       builder: (context, child) {
         final turn = _controller.value * 2 * math.pi;
-        // Float: up to 4% of the size up and down. Sway: about ±2°,
-        // twice per float, pivoting near the top like it hangs from its
-        // wings.
-        final lift = math.sin(turn) * widget.size * 0.04;
-        final sway = math.sin(turn * 2) * 0.035;
+        // Float: up and down once per cycle. Sway: twice per cycle,
+        // pivoting near the top like it hangs from its wings.
+        final lift = math.sin(turn) * widget.size * widget.lift;
+        final sway = math.sin(turn * 2) * widget.sway;
         return Transform.translate(
           offset: Offset(0, lift),
           child: Transform.rotate(
