@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pando_client/pando_client.dart';
+import 'package:pando_shared/pando_shared.dart';
 import 'package:pando_flutter/services/step_history.dart';
 import 'package:pando_flutter/services/walk_recorder.dart';
-import 'package:serverpod_database/serverpod_database.dart';
+import 'package:serverpod_offline_sync_client/serverpod_offline_sync_client.dart'
+    show OfflineSyncDatabaseSession;
 
 /// Returns the slices it was given, or throws when [unavailable].
 class FakeStepHistory implements StepHistory {
@@ -27,7 +29,7 @@ class FakeStepHistory implements StepHistory {
 
 void main() {
   late Directory dir;
-  late ClientDatabaseSession db;
+  late OfflineSyncDatabaseSession db;
   late FakeStepHistory history;
   late WalkRecorder recorder;
 
@@ -36,12 +38,15 @@ void main() {
 
   setUp(() async {
     dir = await Directory.systemTemp.createTemp('pando_db_test');
-    // The real client-side database (SQLite file + generated migrations).
-    db = await Client(
-      'http://localhost:8080/',
-    ).createSession('${dir.path}/pando.db', isDebugMode: true);
+    // The real client-side database (SQLite file + generated migrations),
+    // wrapped by offline sync for one user, as in the app.
+    db = await Client('http://localhost:8080/').createSyncSession(
+      '${dir.path}/pando.db',
+      isDebugMode: true,
+      persistentUserId: const Uuid().v4obj(),
+    );
     history = FakeStepHistory();
-    recorder = WalkRecorder(db, history);
+    recorder = WalkRecorder(() async => db, history);
   });
 
   tearDown(() async {
@@ -81,7 +86,7 @@ void main() {
     await recorder.setStartCount('walk-1', 12000);
 
     // Pando is killed: a new recorder over the same database file.
-    final reopened = WalkRecorder(db, history);
+    final reopened = WalkRecorder(() async => db, history);
     final leftover = await reopened.inProgress();
     expect(leftover, isNotNull);
     expect(leftover!.startedAt, start);

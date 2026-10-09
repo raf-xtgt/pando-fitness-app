@@ -23,7 +23,10 @@ import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'package:serverpod_database/serverpod_database.dart' as _isd;
+import 'package:serverpod_offline_sync_client/serverpod_offline_sync_client.dart'
+    as _ipulbpi2;
 import 'protocol.dart' as _il2as5qe;
+import 'sync_tables.dart' as _ii3f3u05;
 import 'package:pando_client/migrations/migration_registry.dart';
 
 /// Lets the app sign in without an account: one phone = one user.
@@ -188,10 +191,13 @@ class EndpointSession extends _isc.EndpointRef {
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _iaic.Caller(client);
+    offline_sync = _ipulbpi2.Caller(client);
     serverpod_auth_core = _iacc.Caller(client);
   }
 
   late final _iaic.Caller serverpod_auth_idp;
+
+  late final _ipulbpi2.Caller offline_sync;
 
   late final _iacc.Caller serverpod_auth_core;
 }
@@ -255,6 +261,7 @@ class Client extends _isc.ServerpodClientShared {
   @override
   Map<String, _isc.ModuleEndpointCaller> get moduleLookup => {
     'serverpod_auth_idp': modules.serverpod_auth_idp,
+    'offline_sync': modules.offline_sync,
     'serverpod_auth_core': modules.serverpod_auth_core,
   };
 
@@ -283,5 +290,31 @@ class Client extends _isc.ServerpodClientShared {
       runMigrations: runMigrations,
       isDebugMode: isDebugMode,
     );
+  }
+
+  /// Creates a new client-side database session for the given path, wrapped
+  /// with the `serverpod_offline_sync` engine for the tables declared with
+  /// `database: sync`. See [createSession] for the [path], [runMigrations] and
+  /// [isDebugMode] parameters.
+  ///
+  /// The [persistentUserId] is the user all local operations belong to. When
+  /// omitted, the user must be passed through the transaction.
+  _ida.Future<_ipulbpi2.OfflineSyncDatabaseSession> createSyncSession(
+    String path, {
+    bool runMigrations = true,
+    bool isDebugMode = false,
+    _isc.UuidValue? persistentUserId,
+  }) async {
+    final session = _ipulbpi2.OfflineSyncDatabaseSession.wraps(
+      await createSession(
+        path,
+        runMigrations: runMigrations,
+        isDebugMode: isDebugMode,
+      ),
+      syncTables: _ii3f3u05.syncTables,
+      persistentUserId: persistentUserId,
+    );
+    await session.db.initialize();
+    return session;
   }
 }

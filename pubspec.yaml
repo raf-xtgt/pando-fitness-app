@@ -8,4 +8,5 @@ workspace:
   - pando_client
   - pando_server
   - pando_flutter
+  - pando_shared
 

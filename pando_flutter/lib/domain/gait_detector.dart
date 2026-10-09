@@ -1,8 +1,11 @@
 /// Pure Dart: decides whether the walker is standing, walking or running
-/// from the step timeline. Thresholds are constants, tuned in testing.
+/// from the step timeline. The limits come from `GaitRules` in
+/// `pando_shared`, so the live map and the replay classify the same way.
 library;
 
-enum Gait { standing, walking, running }
+import 'package:pando_shared/pando_shared.dart';
+
+export 'package:pando_shared/pando_shared.dart' show Gait;
 
 /// Cumulative steps for this session at a point in time.
 class StepSample {
@@ -25,8 +28,8 @@ int stepsAt(List<StepSample> timeline, DateTime time) {
 class GaitDetector {
   const GaitDetector({
     this.cadenceWindow = const Duration(seconds: 10),
-    this.standingWindow = const Duration(seconds: 3),
-    this.runningStepsPerMinute = 140,
+    this.standingWindow = GaitRules.standingWindow,
+    this.runningStepsPerMinute = GaitRules.runningStepsPerMinute,
   });
 
   /// Cadence is averaged over this window.

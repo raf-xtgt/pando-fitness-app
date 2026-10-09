@@ -9,13 +9,24 @@ import 'api_client.dart';
 /// Server writes that haven't gone through yet (no signal in the park,
 /// server asleep). Kept as a JSON list in shared_preferences, sent in order,
 /// and flushed on startup, on Home, and right after anything is added.
+///
+/// A session is saved only after [syncWalks] (Serverpod offline sync of the
+/// walk slices) succeeds, so the server always has a session's slices when
+/// it has the session. Offline sync is experimental: after
+/// [maxSyncFailures] failed syncs for one session, it's saved anyway (the
+/// report then comes without a replay) rather than never.
 class PendingQueue {
-  PendingQueue(this._prefs, this._api);
+  PendingQueue(this._prefs, this._api, {required this.syncWalks});
+
+  static const maxSyncFailures = 3;
 
   static const _key = 'pending_queue';
 
   final SharedPreferences _prefs;
   final ApiClient _api;
+
+  /// Sends the phone's walk slices to the server.
+  final Future<void> Function() syncWalks;
 
   /// The send in progress, so a second caller waits for it.
   Future<void>? _flushing;
@@ -51,6 +62,7 @@ class PendingQueue {
     while (items.isNotEmpty) {
       final item = items.first;
       try {
+        if (item['op'] == saveSessionOp) await _syncBeforeSave(item);
         await _send(item['op'] as String, item['payload'] as Map);
       } catch (e) {
         debugPrint('Pando queue: ${item['op']} not sent yet ($e)');
@@ -58,6 +70,26 @@ class PendingQueue {
       }
       await _save(items.where((i) => i['id'] != item['id']).toList());
       debugPrint('Pando queue: sent ${item['op']}');
+    }
+  }
+
+  /// Syncs the walk slices. A failure stops the flush (the session waits),
+  /// unless this session's sync already failed [maxSyncFailures] times.
+  Future<void> _syncBeforeSave(Map<String, dynamic> item) async {
+    try {
+      await syncWalks();
+      debugPrint('Pando queue: walk slices synced');
+    } catch (e) {
+      final failures = (item['syncFailures'] as int? ?? 0) + 1;
+      await _save([
+        for (final i in items)
+          if (i['id'] == item['id']) {...i, 'syncFailures': failures} else i,
+      ]);
+      if (failures < maxSyncFailures) rethrow;
+      debugPrint(
+        'Pando queue: walk sync failed $failures times ($e); '
+        'saving the session without its slices',
+      );
     }
   }
 

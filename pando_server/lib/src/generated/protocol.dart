@@ -12,12 +12,15 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:pando_server/src/generated/activity_session.dart' as _inhq2gcy;
+import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'package:serverpod_offline_sync_server/serverpod_offline_sync_server.dart'
+    as _izehhkf5;
 import 'activity_plan.dart' as _ic0xtzcg;
 import 'activity_session.dart' as _ij0gynqy;
 import 'feel.dart' as _ifrvopus;
@@ -27,7 +30,6 @@ import 'session_input.dart' as _ikrqxmzf;
 import 'session_report.dart' as _iqhwxw5q;
 import 'user_profile.dart' as _ir2mn8w1;
 import 'walk_in_progress.dart' as _ie46f9by;
-import 'walk_slice.dart' as _ichtdng7;
 export 'activity_plan.dart';
 export 'activity_session.dart';
 export 'feel.dart';
@@ -35,7 +37,7 @@ export 'session_input.dart';
 export 'session_report.dart';
 export 'user_profile.dart';
 export 'walk_in_progress.dart';
-export 'walk_slice.dart';
+export 'sync_tables.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -284,7 +286,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     ..._iais.Protocol.targetTableDefinitions,
+    ..._izehhkf5.Protocol.targetTableDefinitions,
     ..._iacs.Protocol.targetTableDefinitions,
+    ..._ip2bu2mq.Protocol() is _is.DatabaseSerializationManager
+        ? (_ip2bu2mq.Protocol() as _is.DatabaseSerializationManager)
+              .getTargetTableDefinitions()
+        : [],
     ..._isp.Protocol.targetTableDefinitions,
   ];
 
@@ -340,9 +347,6 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ie46f9by.WalkInProgress) {
       return _ie46f9by.WalkInProgress.fromJson(data) as T;
     }
-    if (t == _ichtdng7.WalkSlice) {
-      return _ichtdng7.WalkSlice.fromJson(data) as T;
-    }
     if (t == _is.getType<_ic0xtzcg.ActivityPlan?>()) {
       return (data != null ? _ic0xtzcg.ActivityPlan.fromJson(data) : null) as T;
     }
@@ -376,9 +380,6 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null ? _ie46f9by.WalkInProgress.fromJson(data) : null)
           as T;
     }
-    if (t == _is.getType<_ichtdng7.WalkSlice?>()) {
-      return (data != null ? _ichtdng7.WalkSlice.fromJson(data) : null) as T;
-    }
     if (t == List<double>) {
       return (data as List).map((e) => deserialize<double>(e)).toList() as T;
     }
@@ -392,7 +393,13 @@ class Protocol extends _is.DatabaseSerializationManager {
       return _iais.Protocol().deserialize<T>(data, t);
     } on _is.DeserializationTypeNotFoundException catch (_) {}
     try {
+      return _izehhkf5.Protocol().deserialize<T>(data, t);
+    } on _is.DeserializationTypeNotFoundException catch (_) {}
+    try {
       return _iacs.Protocol().deserialize<T>(data, t);
+    } on _is.DeserializationTypeNotFoundException catch (_) {}
+    try {
+      return _ip2bu2mq.Protocol().deserialize<T>(data, t);
     } on _is.DeserializationTypeNotFoundException catch (_) {}
     try {
       return _isp.Protocol().deserialize<T>(data, t);
@@ -411,7 +418,6 @@ class Protocol extends _is.DatabaseSerializationManager {
       _iqhwxw5q.SessionReport => 'SessionReport',
       _ir2mn8w1.UserProfile => 'UserProfile',
       _ie46f9by.WalkInProgress => 'WalkInProgress',
-      _ichtdng7.WalkSlice => 'WalkSlice',
       _ => null,
     };
   }
@@ -442,8 +448,6 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'UserProfile';
       case _ie46f9by.WalkInProgress():
         return 'WalkInProgress';
-      case _ichtdng7.WalkSlice():
-        return 'WalkSlice';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -451,11 +455,21 @@ class Protocol extends _is.DatabaseSerializationManager {
           ? className
           : 'serverpod_auth_idp.$className';
     }
+    className = _izehhkf5.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return className.contains('.')
+          ? className
+          : 'serverpod_offline_sync.$className';
+    }
     className = _iacs.Protocol().getClassNameForObject(data);
     if (className != null) {
       return className.contains('.')
           ? className
           : 'serverpod_auth_core.$className';
+    }
+    className = _ip2bu2mq.Protocol().getClassNameForObject(data);
+    if (className != null) {
+      return className.contains('.') ? className : 'pando_shared.$className';
     }
     className = _isp.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -496,16 +510,21 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'WalkInProgress') {
       return deserialize<_ie46f9by.WalkInProgress>(data['data']);
     }
-    if (dataClassName == 'WalkSlice') {
-      return deserialize<_ichtdng7.WalkSlice>(data['data']);
-    }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
       return _iais.Protocol().deserializeByClassName(data);
     }
+    if (dataClassName.startsWith('serverpod_offline_sync.')) {
+      data['className'] = dataClassName.substring(23);
+      return _izehhkf5.Protocol().deserializeByClassName(data);
+    }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
       return _iacs.Protocol().deserializeByClassName(data);
+    }
+    if (dataClassName.startsWith('pando_shared.')) {
+      data['className'] = dataClassName.substring(13);
+      return _ip2bu2mq.Protocol().deserializeByClassName(data);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -516,7 +535,9 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   void _registerHostProtocols() {
     _iais.Protocol().registerHostProtocol('pando', this);
+    _izehhkf5.Protocol().registerHostProtocol('pando', this);
     _iacs.Protocol().registerHostProtocol('pando', this);
+    _ip2bu2mq.Protocol().registerHostProtocol('pando', this);
   }
 
   @override
@@ -528,7 +549,22 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
     {
+      var table = _izehhkf5.Protocol().getTableForType(t);
+      if (table != null) {
+        return table;
+      }
+    }
+    {
       var table = _iacs.Protocol().getTableForType(t);
+      if (table != null) {
+        return table;
+      }
+    }
+    {
+      var protocol = _ip2bu2mq.Protocol();
+      var table = protocol is _is.DatabaseSerializationManager
+          ? (protocol as _is.DatabaseSerializationManager).getTableForType(t)
+          : null;
       if (table != null) {
         return table;
       }
@@ -566,6 +602,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     try {
       return _iais.Protocol().mapRecordToJson(record);
+    } catch (_) {}
+    try {
+      return _izehhkf5.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
       return _iacs.Protocol().mapRecordToJson(record);

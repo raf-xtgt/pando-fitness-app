@@ -1,8 +1,9 @@
 ### Steps in one 30 s slice of a walk, from the phone's step history.
-### Written at Stop. Phone only for now; synced to the server in slice 8.
+### Written on the phone at Stop and synced to the server's Postgres by
+### Serverpod offline sync (UUID id and `spaceId` come from the sync module).
 class: WalkSlice
 table: walk_slice
-database: client
+database: sync
 fields:
   clientSessionId: String
   startAt: DateTime

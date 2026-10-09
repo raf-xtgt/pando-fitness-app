@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
+import 'package:pando_shared/pando_shared.dart';
 
 import '../../app/theme.dart';
 import '../../domain/gait_detector.dart';

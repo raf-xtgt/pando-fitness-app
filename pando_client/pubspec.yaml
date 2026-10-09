@@ -7,6 +7,9 @@ environment:
 resolution: workspace
 
 dependencies:
-  serverpod_auth_idp_client: 4.0.3
-  serverpod_client: 4.0.3
-  serverpod_database: 4.0.3
+  pando_shared:
+    path: ../pando_shared
+  serverpod_auth_idp_client: 4.0.4
+  serverpod_client: 4.0.4
+  serverpod_database: 4.0.4
+  serverpod_offline_sync_client: 0.0.10

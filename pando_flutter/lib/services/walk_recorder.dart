@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:pando_client/pando_client.dart';
+import 'package:pando_shared/pando_shared.dart';
 import 'package:serverpod_database/serverpod_database.dart';
 
 import '../domain/gait_detector.dart';
@@ -14,11 +15,12 @@ import 'step_history.dart';
 /// A [WalkInProgress] row found at app start means Pando was killed
 /// mid-walk; Home offers **Finish walk**.
 class WalkRecorder {
-  WalkRecorder(this._db, this._history);
+  WalkRecorder(this._openDb, this._history);
 
   static const Duration sliceSize = Duration(seconds: 30);
 
-  final DatabaseSession _db;
+  /// The on-phone database, opened on first use (see `LocalDb`).
+  final Future<DatabaseSession> Function() _openDb;
   final StepHistory _history;
 
   Future<void> begin({
@@ -28,7 +30,7 @@ class WalkRecorder {
     required double resumeMetres,
   }) async {
     await WalkInProgress.db.insertRow(
-      _db,
+      await _openDb(),
       WalkInProgress(
         clientSessionId: clientSessionId,
         startedAt: startedAt.toUtc(),
@@ -42,12 +44,17 @@ class WalkRecorder {
   Future<void> setStartCount(String clientSessionId, int count) async {
     final row = await _find(clientSessionId);
     if (row == null) return;
-    await WalkInProgress.db.updateRow(_db, row.copyWith(startCount: count));
+    await WalkInProgress.db.updateRow(
+      await _openDb(),
+      row.copyWith(startCount: count),
+    );
   }
 
   /// The walk Pando was killed in the middle of, if any.
-  Future<WalkInProgress?> inProgress() =>
-      WalkInProgress.db.findFirstRow(_db, orderBy: (t) => t.startedAt);
+  Future<WalkInProgress?> inProgress() async => WalkInProgress.db.findFirstRow(
+    await _openDb(),
+    orderBy: (t) => t.startedAt,
+  );
 
   /// Reads the walk from the step history and keeps it as [WalkSlice] rows,
   /// replacing any kept before (so a retried Finish walk is safe). Returns
@@ -68,14 +75,15 @@ class WalkRecorder {
           steps: s.steps,
         ),
     ];
-    await _db.db.transaction((transaction) async {
+    final db = await _openDb();
+    await db.db.transaction((transaction) async {
       await WalkSlice.db.deleteWhere(
-        _db,
+        db,
         where: (t) => t.clientSessionId.equals(clientSessionId),
         transaction: transaction,
       );
       if (slices.isNotEmpty) {
-        await WalkSlice.db.insert(_db, slices, transaction: transaction);
+        await WalkSlice.db.insert(db, slices, transaction: transaction);
       }
     });
     debugPrint(
@@ -92,24 +100,26 @@ class WalkRecorder {
   }
 
   /// The kept slices of a walk, oldest first.
-  Future<List<WalkSlice>> slicesOf(String clientSessionId) => WalkSlice.db.find(
-    _db,
-    where: (t) => t.clientSessionId.equals(clientSessionId),
-    orderBy: (t) => t.startAt,
-  );
+  Future<List<WalkSlice>> slicesOf(String clientSessionId) async =>
+      WalkSlice.db.find(
+        await _openDb(),
+        where: (t) => t.clientSessionId.equals(clientSessionId),
+        orderBy: (t) => t.startAt,
+      );
 
   /// The session is safely queued for the server; the walk is no longer in
-  /// progress. The slices stay (they go to the server in slice 8).
+  /// progress. The slices stay; offline sync sends them before the session
+  /// is saved (see `PendingQueue`).
   Future<void> end(String clientSessionId) async {
     await WalkInProgress.db.deleteWhere(
-      _db,
+      await _openDb(),
       where: (t) => t.clientSessionId.equals(clientSessionId),
     );
   }
 
-  Future<WalkInProgress?> _find(String clientSessionId) =>
+  Future<WalkInProgress?> _find(String clientSessionId) async =>
       WalkInProgress.db.findFirstRow(
-        _db,
+        await _openDb(),
         where: (t) => t.clientSessionId.equals(clientSessionId),
       );
 

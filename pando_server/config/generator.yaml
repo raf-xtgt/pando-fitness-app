@@ -2,3 +2,14 @@ type: server
 
 client_package_path: ../pando_client
 server_test_tools_path: test/integration/test_tools
+
+# Models + pure-Dart logic used by both the app and the server.
+shared_packages:
+  - ../pando_shared
+
+modules:
+  serverpod_offline_sync:
+    nickname: offline_sync
+
+experimental_features:
+  databaseSync: true

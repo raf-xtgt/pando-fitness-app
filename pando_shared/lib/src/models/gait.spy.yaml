@@ -1,0 +1,7 @@
+### How the walker moves, from their cadence (see `GaitRules`).
+enum: Gait
+serialized: byName
+values:
+  - standing
+  - walking
+  - running

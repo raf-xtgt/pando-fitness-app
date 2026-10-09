@@ -39,11 +39,12 @@ class AppServices {
     final prefs = await SharedPreferences.getInstance();
     final api = ApiClient();
     await api.init();
-    final queue = PendingQueue(prefs, api);
+    final localDb = LocalDb(api);
+    final queue = PendingQueue(prefs, api, syncWalks: localDb.syncOnce);
     final push = PushService(prefs, queue);
     await push.init();
     final history = RecordingApiStepHistory();
-    final recorder = WalkRecorder(await openLocalDb(api), history);
+    final recorder = WalkRecorder(() => localDb.session, history);
     instance = AppServices._(
       api,
       LocalCache(prefs),

@@ -37,13 +37,16 @@ dependencies:
   flutter_svg: ^2.3.0
   pando_client:
     path: ../pando_client
+  pando_shared:
+    path: ../pando_shared
   path: ^1.9.1
   path_provider: ^2.1.6
   pedometer: ^4.2.0
   permission_handler: ^13.0.2
-  serverpod_auth_idp_flutter: 4.0.3
-  serverpod_database: 4.0.3
-  serverpod_flutter: 4.0.3
+  serverpod_auth_idp_flutter: 4.0.4
+  serverpod_database: 4.0.4
+  serverpod_flutter: 4.0.4
+  serverpod_offline_sync_client: 0.0.10
   shared_preferences: ^2.5.6
   uuid: ^4.6.0
 

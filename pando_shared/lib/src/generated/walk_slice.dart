@@ -10,15 +10,17 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'package:serverpod_database/serverpod_database.dart' as _isd;
+import 'package:serverpod_serialization/serverpod_serialization.dart' as _iss;
 
 /// Steps in one 30 s slice of a walk, from the phone's step history.
-/// Written at Stop. Phone only for now; synced to the server in slice 8.
+/// Written on the phone at Stop and synced to the server's Postgres by
+/// Serverpod offline sync (UUID id and `spaceId` come from the sync module).
 abstract class WalkSlice
-    implements _isd.TableRow<int?>, _isc.ProtocolSerialization {
+    implements _isd.TableRow<_iss.UuidValue?>, _iss.ProtocolSerialization {
   WalkSlice._({
     this.id,
+    this.spaceId,
     required this.clientSessionId,
     required this.startAt,
     required this.endAt,
@@ -26,7 +28,8 @@ abstract class WalkSlice
   });
 
   factory WalkSlice({
-    int? id,
+    _iss.UuidValue? id,
+    int? spaceId,
     required String clientSessionId,
     required DateTime startAt,
     required DateTime endAt,
@@ -35,12 +38,15 @@ abstract class WalkSlice
 
   factory WalkSlice.fromJson(Map<String, dynamic> jsonSerialization) {
     return WalkSlice(
-      id: jsonSerialization['id'] as int?,
+      id: jsonSerialization['id'] == null
+          ? null
+          : _iss.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
+      spaceId: jsonSerialization['spaceId'] as int?,
       clientSessionId: jsonSerialization['clientSessionId'] as String,
-      startAt: _isc.DateTimeJsonExtension.fromJson(
+      startAt: _iss.DateTimeJsonExtension.fromJson(
         jsonSerialization['startAt'],
       ),
-      endAt: _isc.DateTimeJsonExtension.fromJson(jsonSerialization['endAt']),
+      endAt: _iss.DateTimeJsonExtension.fromJson(jsonSerialization['endAt']),
       steps: jsonSerialization['steps'] as int,
     );
   }
@@ -50,7 +56,10 @@ abstract class WalkSlice
   static const db = WalkSliceRepository._();
 
   @override
-  int? id;
+  _iss.UuidValue? id;
+
+  /// The space owning this row. Maintained by the sync engine.
+  int? spaceId;
 
   String clientSessionId;
 
@@ -61,13 +70,14 @@ abstract class WalkSlice
   int steps;
 
   @override
-  _isd.Table<int?> get table => t;
+  _isd.Table<_iss.UuidValue?> get table => t;
 
   /// Returns a shallow copy of this [WalkSlice]
   /// with some or all fields replaced by the given arguments.
-  @_isc.useResult
+  @_iss.useResult
   WalkSlice copyWith({
-    int? id,
+    _iss.UuidValue? id,
+    int? spaceId,
     String? clientSessionId,
     DateTime? startAt,
     DateTime? endAt,
@@ -77,7 +87,8 @@ abstract class WalkSlice
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'WalkSlice',
-      if (id != null) 'id': id,
+      if (id != null) 'id': id?.toJson(),
+      if (spaceId != null) 'spaceId': spaceId,
       'clientSessionId': clientSessionId,
       'startAt': startAt.toJson(),
       'endAt': endAt.toJson(),
@@ -89,7 +100,8 @@ abstract class WalkSlice
   Map<String, dynamic> toJsonForProtocol() {
     return {
       '__className__': 'WalkSlice',
-      if (id != null) 'id': id,
+      if (id != null) 'id': id?.toJson(),
+      if (spaceId != null) 'spaceId': spaceId,
       'clientSessionId': clientSessionId,
       'startAt': startAt.toJson(),
       'endAt': endAt.toJson(),
@@ -121,7 +133,7 @@ abstract class WalkSlice
 
   @override
   String toString() {
-    return _isc.SerializationManager.encode(this);
+    return _iss.SerializationManager.encode(this);
   }
 }
 
@@ -129,13 +141,15 @@ class _Undefined {}
 
 class _WalkSliceImpl extends WalkSlice {
   _WalkSliceImpl({
-    int? id,
+    _iss.UuidValue? id,
+    int? spaceId,
     required String clientSessionId,
     required DateTime startAt,
     required DateTime endAt,
     required int steps,
   }) : super._(
          id: id,
+         spaceId: spaceId,
          clientSessionId: clientSessionId,
          startAt: startAt,
          endAt: endAt,
@@ -144,17 +158,19 @@ class _WalkSliceImpl extends WalkSlice {
 
   /// Returns a shallow copy of this [WalkSlice]
   /// with some or all fields replaced by the given arguments.
-  @_isc.useResult
+  @_iss.useResult
   @override
   WalkSlice copyWith({
     Object? id = _Undefined,
+    Object? spaceId = _Undefined,
     String? clientSessionId,
     DateTime? startAt,
     DateTime? endAt,
     int? steps,
   }) {
     return WalkSlice(
-      id: id is int? ? id : this.id,
+      id: id is _iss.UuidValue? ? id : this.id,
+      spaceId: spaceId is int? ? spaceId : this.spaceId,
       clientSessionId: clientSessionId ?? this.clientSessionId,
       startAt: startAt ?? this.startAt,
       endAt: endAt ?? this.endAt,
@@ -166,52 +182,36 @@ class _WalkSliceImpl extends WalkSlice {
 class WalkSliceUpdateTable extends _isd.UpdateTable<WalkSliceTable> {
   WalkSliceUpdateTable(super.table);
 
+  _isd.ColumnValue<int, int> spaceId(int? value) =>
+      _isd.ColumnValue(table.spaceId, value);
+
   _isd.ColumnValue<String, String> clientSessionId(String value) =>
-      _isd.ColumnValue(
-        table.clientSessionId,
-        value,
-      );
+      _isd.ColumnValue(table.clientSessionId, value);
 
   _isd.ColumnValue<DateTime, DateTime> startAt(DateTime value) =>
-      _isd.ColumnValue(
-        table.startAt,
-        value,
-      );
+      _isd.ColumnValue(table.startAt, value);
 
   _isd.ColumnValue<DateTime, DateTime> endAt(DateTime value) =>
-      _isd.ColumnValue(
-        table.endAt,
-        value,
-      );
+      _isd.ColumnValue(table.endAt, value);
 
-  _isd.ColumnValue<int, int> steps(int value) => _isd.ColumnValue(
-    table.steps,
-    value,
-  );
+  _isd.ColumnValue<int, int> steps(int value) =>
+      _isd.ColumnValue(table.steps, value);
 }
 
-class WalkSliceTable extends _isd.Table<int?> {
+class WalkSliceTable extends _isd.Table<_iss.UuidValue?> {
   WalkSliceTable({super.tableRelation}) : super(tableName: 'walk_slice') {
     updateTable = WalkSliceUpdateTable(this);
-    clientSessionId = _isd.ColumnString(
-      'clientSessionId',
-      this,
-    );
-    startAt = _isd.ColumnDateTime(
-      'startAt',
-      this,
-    );
-    endAt = _isd.ColumnDateTime(
-      'endAt',
-      this,
-    );
-    steps = _isd.ColumnInt(
-      'steps',
-      this,
-    );
+    spaceId = _isd.ColumnInt('spaceId', this);
+    clientSessionId = _isd.ColumnString('clientSessionId', this);
+    startAt = _isd.ColumnDateTime('startAt', this);
+    endAt = _isd.ColumnDateTime('endAt', this);
+    steps = _isd.ColumnInt('steps', this);
   }
 
   late final WalkSliceUpdateTable updateTable;
+
+  /// The space owning this row. Maintained by the sync engine.
+  late final _isd.ColumnInt spaceId;
 
   late final _isd.ColumnString clientSessionId;
 
@@ -224,6 +224,7 @@ class WalkSliceTable extends _isd.Table<int?> {
   @override
   List<_isd.Column> get columns => [
     id,
+    spaceId,
     clientSessionId,
     startAt,
     endAt,
@@ -238,7 +239,7 @@ class WalkSliceInclude extends _isd.IncludeObject {
   Map<String, _isd.Include?> get includes => {};
 
   @override
-  _isd.Table<int?> get table => WalkSlice.t;
+  _isd.Table<_iss.UuidValue?> get table => WalkSlice.t;
 }
 
 class WalkSliceIncludeList extends _isd.IncludeList {
@@ -257,7 +258,7 @@ class WalkSliceIncludeList extends _isd.IncludeList {
   Map<String, _isd.Include?> get includes => include?.includes ?? {};
 
   @override
-  _isd.Table<int?> get table => WalkSlice.t;
+  _isd.Table<_iss.UuidValue?> get table => WalkSlice.t;
 }
 
 class WalkSliceRepository {
@@ -349,7 +350,7 @@ class WalkSliceRepository {
   /// Finds a single [WalkSlice] by its [id] or null if no such row exists.
   Future<WalkSlice?> findById(
     _isd.DatabaseSession session,
-    int id, {
+    _iss.UuidValue id, {
     _isd.Transaction? transaction,
     _isd.LockMode? lockMode,
     _isd.LockBehavior? lockBehavior,
@@ -399,10 +400,7 @@ class WalkSliceRepository {
     WalkSlice row, {
     _isd.Transaction? transaction,
   }) async {
-    return session.db.insertRow<WalkSlice>(
-      row,
-      transaction: transaction,
-    );
+    return session.db.insertRow<WalkSlice>(row, transaction: transaction);
   }
 
   /// Upserts all [WalkSlice]s in the list and returns the resulting rows.
@@ -518,7 +516,7 @@ class WalkSliceRepository {
   /// Returns the updated row or null if no row with the given id exists.
   Future<WalkSlice?> updateById(
     _isd.DatabaseSession session,
-    int id, {
+    _iss.UuidValue id, {
     required _isd.ColumnValueListBuilder<WalkSliceUpdateTable> columnValues,
     _isd.Transaction? transaction,
   }) async {
@@ -592,10 +590,7 @@ class WalkSliceRepository {
     WalkSlice row, {
     _isd.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<WalkSlice>(
-      row,
-      transaction: transaction,
-    );
+    return session.db.deleteRow<WalkSlice>(row, transaction: transaction);
   }
 
   /// Deletes all rows matching the [where] expression.

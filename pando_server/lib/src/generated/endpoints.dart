@@ -17,6 +17,8 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'package:serverpod_offline_sync_server/serverpod_offline_sync_server.dart'
+    as _izehhkf5;
 import '../auth/anonymous_idp_endpoint.dart' as _in0zita6;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/demo_endpoint.dart' as _irow5ity;
@@ -246,6 +248,8 @@ class Endpoints extends _is.EndpointDispatch {
       },
     );
     modules['serverpod_auth_idp'] = _iais.Endpoints()
+      ..initializeEndpoints(server);
+    modules['serverpod_offline_sync'] = _izehhkf5.Endpoints()
       ..initializeEndpoints(server);
     modules['serverpod_auth_core'] = _iacs.Endpoints()
       ..initializeEndpoints(server);

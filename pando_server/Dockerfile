@@ -8,12 +8,15 @@ FROM dart:3.13.4 AS build
 WORKDIR /app
 COPY pubspec.lock .
 COPY pando_server pando_server
+# Models and rules shared with the app (path dependency of the server).
+COPY pando_shared pando_shared
 RUN printf '%s\n' \
   'name: _' \
   'environment:' \
   '  sdk: ^3.12.2' \
   'workspace:' \
   '  - pando_server' \
+  '  - pando_shared' \
   > pubspec.yaml
 RUN dart pub get
 
