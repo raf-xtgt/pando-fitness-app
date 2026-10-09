@@ -26,12 +26,16 @@ import 'future_calls_generated_models/send_report_notification_future_call_send_
 import 'session_input.dart' as _ikrqxmzf;
 import 'session_report.dart' as _iqhwxw5q;
 import 'user_profile.dart' as _ir2mn8w1;
+import 'walk_in_progress.dart' as _ie46f9by;
+import 'walk_slice.dart' as _ichtdng7;
 export 'activity_plan.dart';
 export 'activity_session.dart';
 export 'feel.dart';
 export 'session_input.dart';
 export 'session_report.dart';
 export 'user_profile.dart';
+export 'walk_in_progress.dart';
+export 'walk_slice.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -333,6 +337,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ir2mn8w1.UserProfile) {
       return _ir2mn8w1.UserProfile.fromJson(data) as T;
     }
+    if (t == _ie46f9by.WalkInProgress) {
+      return _ie46f9by.WalkInProgress.fromJson(data) as T;
+    }
+    if (t == _ichtdng7.WalkSlice) {
+      return _ichtdng7.WalkSlice.fromJson(data) as T;
+    }
     if (t == _is.getType<_ic0xtzcg.ActivityPlan?>()) {
       return (data != null ? _ic0xtzcg.ActivityPlan.fromJson(data) : null) as T;
     }
@@ -361,6 +371,13 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_ir2mn8w1.UserProfile?>()) {
       return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ie46f9by.WalkInProgress?>()) {
+      return (data != null ? _ie46f9by.WalkInProgress.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ichtdng7.WalkSlice?>()) {
+      return (data != null ? _ichtdng7.WalkSlice.fromJson(data) : null) as T;
     }
     if (t == List<double>) {
       return (data as List).map((e) => deserialize<double>(e)).toList() as T;
@@ -393,6 +410,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ikrqxmzf.SessionInput => 'SessionInput',
       _iqhwxw5q.SessionReport => 'SessionReport',
       _ir2mn8w1.UserProfile => 'UserProfile',
+      _ie46f9by.WalkInProgress => 'WalkInProgress',
+      _ichtdng7.WalkSlice => 'WalkSlice',
       _ => null,
     };
   }
@@ -421,6 +440,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'SessionReport';
       case _ir2mn8w1.UserProfile():
         return 'UserProfile';
+      case _ie46f9by.WalkInProgress():
+        return 'WalkInProgress';
+      case _ichtdng7.WalkSlice():
+        return 'WalkSlice';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -469,6 +492,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'UserProfile') {
       return deserialize<_ir2mn8w1.UserProfile>(data['data']);
+    }
+    if (dataClassName == 'WalkInProgress') {
+      return deserialize<_ie46f9by.WalkInProgress>(data['data']);
+    }
+    if (dataClassName == 'WalkSlice') {
+      return deserialize<_ichtdng7.WalkSlice>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);

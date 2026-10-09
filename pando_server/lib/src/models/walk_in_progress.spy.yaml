@@ -1,0 +1,19 @@
+### A walk that has started but isn't saved yet. Lives only in the phone's
+### SQLite, so a walk survives Pando being killed. Deleted once the session
+### is queued for the server.
+class: WalkInProgress
+table: walk_in_progress
+database: client
+fields:
+  clientSessionId: String
+  startedAt: DateTime
+  ### The phone's step counter (steps since boot) at Start; null until the
+  ### first sensor event. Fallback when the step history can't be read.
+  startCount: int?
+  ### The plan the walker saw at Start.
+  goalSteps: int
+  resumeMetres: double
+indexes:
+  walk_in_progress_client_id_idx:
+    fields: clientSessionId
+    unique: true

@@ -14,6 +14,20 @@ Future<bool> requestStepPermission() async {
   return status.isGranted;
 }
 
+/// The step counter's current value (steps since boot), or null if the
+/// sensor says nothing within [timeout].
+Future<int?> currentStepCount({
+  Duration timeout = const Duration(seconds: 3),
+}) async {
+  try {
+    final event = await Pedometer.stepCountStream.first.timeout(timeout);
+    return event.steps;
+  } catch (e) {
+    debugPrint('Pando steps: no counter value ($e)');
+    return null;
+  }
+}
+
 /// Wraps the phone's step counter. The sensor reports steps since the phone
 /// booted, so the count at Start is the baseline. If the screen turns off
 /// the stream pauses, but the cumulative count catches up on resume.
@@ -22,12 +36,16 @@ class StepCounterService {
   final List<StepSample> _timeline = [];
   StreamSubscription<StepCount>? _subscription;
   int? _baseline;
+  Completer<int> _baselineKnown = Completer();
 
   /// Steps taken since [start].
   int stepsSoFar = 0;
 
   /// `(time, steps)` samples since [start], starting with `(start, 0)`.
   List<StepSample> get timeline => List.unmodifiable(_timeline);
+
+  /// The sensor's count (steps since boot) at [start], from its first event.
+  Future<int> get baseline => _baselineKnown.future;
 
   /// Emits [stepsSoFar] whenever it changes.
   Stream<int> get steps => _steps.stream;
@@ -38,6 +56,7 @@ class StepCounterService {
       ..add(StepSample(DateTime.now(), 0));
     stepsSoFar = 0;
     _baseline = null;
+    _baselineKnown = Completer();
     _subscription = Pedometer.stepCountStream.listen(
       _onCount,
       onError: (Object e) => debugPrint('Pando steps: sensor error $e'),
@@ -45,7 +64,10 @@ class StepCounterService {
   }
 
   void _onCount(StepCount event) {
-    _baseline ??= event.steps;
+    if (_baseline == null) {
+      _baseline = event.steps;
+      _baselineKnown.complete(event.steps);
+    }
     final steps = math.max(0, event.steps - _baseline!);
     debugPrint('Pando steps: sensor=${event.steps} session=$steps');
     if (steps == stepsSoFar) return;

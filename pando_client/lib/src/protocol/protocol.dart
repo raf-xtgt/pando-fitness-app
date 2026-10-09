@@ -17,26 +17,164 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'package:serverpod_database/serverpod_database.dart' as _isd;
 import 'activity_plan.dart' as _ic0xtzcg;
 import 'activity_session.dart' as _ij0gynqy;
 import 'feel.dart' as _ifrvopus;
 import 'session_input.dart' as _ikrqxmzf;
 import 'session_report.dart' as _iqhwxw5q;
 import 'user_profile.dart' as _ir2mn8w1;
+import 'walk_in_progress.dart' as _ie46f9by;
+import 'walk_slice.dart' as _ichtdng7;
 export 'activity_plan.dart';
 export 'activity_session.dart';
 export 'feel.dart';
 export 'session_input.dart';
 export 'session_report.dart';
 export 'user_profile.dart';
+export 'walk_in_progress.dart';
+export 'walk_slice.dart';
 export 'client.dart';
 
-class Protocol extends _isc.SerializationManager {
+class Protocol extends _isd.DatabaseSerializationManager {
   Protocol._();
 
   factory Protocol() => _instance;
 
   static final Protocol _instance = Protocol._().._registerHostProtocols();
+
+  static List<_isd.TableDefinition> get targetTableDefinitions => [
+    _isd.TableDefinition(
+      name: 'walk_in_progress',
+      dartName: 'WalkInProgress',
+      schema: 'public',
+      module: 'pando',
+      columns: [
+        _isd.ColumnDefinition(
+          name: 'id',
+          columnType: _isd.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isd.ColumnDefinition(
+          name: 'clientSessionId',
+          columnType: _isd.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isd.ColumnDefinition(
+          name: 'startedAt',
+          columnType: _isd.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isd.ColumnDefinition(
+          name: 'startCount',
+          columnType: _isd.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isd.ColumnDefinition(
+          name: 'goalSteps',
+          columnType: _isd.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isd.ColumnDefinition(
+          name: 'resumeMetres',
+          columnType: _isd.ColumnType.doublePrecision,
+          isNullable: false,
+          dartType: 'double',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isd.IndexDefinition(
+          indexName: 'walk_in_progress_client_id_idx',
+          tableSpace: null,
+          elements: [
+            _isd.IndexElementDefinition(
+              type: _isd.IndexElementDefinitionType.column,
+              definition: 'clientSessionId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isd.TableDefinition(
+      name: 'walk_slice',
+      dartName: 'WalkSlice',
+      schema: 'public',
+      module: 'pando',
+      columns: [
+        _isd.ColumnDefinition(
+          name: 'id',
+          columnType: _isd.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isd.ColumnDefinition(
+          name: 'clientSessionId',
+          columnType: _isd.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isd.ColumnDefinition(
+          name: 'startAt',
+          columnType: _isd.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isd.ColumnDefinition(
+          name: 'endAt',
+          columnType: _isd.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isd.ColumnDefinition(
+          name: 'steps',
+          columnType: _isd.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isd.IndexDefinition(
+          indexName: 'walk_slice_session_idx',
+          tableSpace: null,
+          elements: [
+            _isd.IndexElementDefinition(
+              type: _isd.IndexElementDefinitionType.column,
+              definition: 'clientSessionId',
+            ),
+            _isd.IndexElementDefinition(
+              type: _isd.IndexElementDefinitionType.column,
+              definition: 'startAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    ..._iaic.Protocol() is _isd.DatabaseSerializationManager
+        ? (_iaic.Protocol() as _isd.DatabaseSerializationManager)
+              .getTargetTableDefinitions()
+        : [],
+    ..._iacc.Protocol() is _isd.DatabaseSerializationManager
+        ? (_iacc.Protocol() as _isd.DatabaseSerializationManager)
+              .getTargetTableDefinitions()
+        : [],
+  ];
 
   static String? getClassNameFromObjectJson(dynamic data) {
     if (data is! Map) return null;
@@ -83,6 +221,12 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ir2mn8w1.UserProfile) {
       return _ir2mn8w1.UserProfile.fromJson(data) as T;
     }
+    if (t == _ie46f9by.WalkInProgress) {
+      return _ie46f9by.WalkInProgress.fromJson(data) as T;
+    }
+    if (t == _ichtdng7.WalkSlice) {
+      return _ichtdng7.WalkSlice.fromJson(data) as T;
+    }
     if (t == _isc.getType<_ic0xtzcg.ActivityPlan?>()) {
       return (data != null ? _ic0xtzcg.ActivityPlan.fromJson(data) : null) as T;
     }
@@ -102,6 +246,13 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_ir2mn8w1.UserProfile?>()) {
       return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ie46f9by.WalkInProgress?>()) {
+      return (data != null ? _ie46f9by.WalkInProgress.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_ichtdng7.WalkSlice?>()) {
+      return (data != null ? _ichtdng7.WalkSlice.fromJson(data) : null) as T;
     }
     if (t == List<double>) {
       return (data as List).map((e) => deserialize<double>(e)).toList() as T;
@@ -129,6 +280,8 @@ class Protocol extends _isc.SerializationManager {
       _ikrqxmzf.SessionInput => 'SessionInput',
       _iqhwxw5q.SessionReport => 'SessionReport',
       _ir2mn8w1.UserProfile => 'UserProfile',
+      _ie46f9by.WalkInProgress => 'WalkInProgress',
+      _ichtdng7.WalkSlice => 'WalkSlice',
       _ => null,
     };
   }
@@ -155,6 +308,10 @@ class Protocol extends _isc.SerializationManager {
         return 'SessionReport';
       case _ir2mn8w1.UserProfile():
         return 'UserProfile';
+      case _ie46f9by.WalkInProgress():
+        return 'WalkInProgress';
+      case _ichtdng7.WalkSlice():
+        return 'WalkSlice';
     }
     className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -195,6 +352,12 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'UserProfile') {
       return deserialize<_ir2mn8w1.UserProfile>(data['data']);
     }
+    if (dataClassName == 'WalkInProgress') {
+      return deserialize<_ie46f9by.WalkInProgress>(data['data']);
+    }
+    if (dataClassName == 'WalkSlice') {
+      return deserialize<_ichtdng7.WalkSlice>(data['data']);
+    }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
       return _iaic.Protocol().deserializeByClassName(data);
@@ -210,6 +373,39 @@ class Protocol extends _isc.SerializationManager {
     _iaic.Protocol().registerHostProtocol('pando', this);
     _iacc.Protocol().registerHostProtocol('pando', this);
   }
+
+  @override
+  _isd.Table? getTableForType(Type t) {
+    {
+      var protocol = _iaic.Protocol();
+      var table = protocol is _isd.DatabaseSerializationManager
+          ? (protocol as _isd.DatabaseSerializationManager).getTableForType(t)
+          : null;
+      if (table != null) {
+        return table;
+      }
+    }
+    {
+      var protocol = _iacc.Protocol();
+      var table = protocol is _isd.DatabaseSerializationManager
+          ? (protocol as _isd.DatabaseSerializationManager).getTableForType(t)
+          : null;
+      if (table != null) {
+        return table;
+      }
+    }
+    switch (t) {
+      case _ie46f9by.WalkInProgress:
+        return _ie46f9by.WalkInProgress.t;
+      case _ichtdng7.WalkSlice:
+        return _ichtdng7.WalkSlice.t;
+    }
+    return null;
+  }
+
+  @override
+  List<_isd.TableDefinition> getTargetTableDefinitions() =>
+      targetTableDefinitions;
 
   @override
   String getModuleName() => 'pando';

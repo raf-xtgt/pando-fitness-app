@@ -16,7 +16,9 @@ class PendingQueue {
 
   final SharedPreferences _prefs;
   final ApiClient _api;
-  bool _flushing = false;
+
+  /// The send in progress, so a second caller waits for it.
+  Future<void>? _flushing;
 
   List<Map<String, dynamic>> get items {
     final raw = _prefs.getString(_key);
@@ -29,32 +31,33 @@ class PendingQueue {
 
   /// Queues a write and tries to send it straight away.
   Future<void> add(String op, Map<String, dynamic> payload) async {
-    await _save([
-      ...items,
-      {'id': const Uuid().v4(), 'op': op, 'payload': payload},
-    ]);
+    await enqueue(op, payload);
     await flush();
   }
 
+  /// Queues a write without sending it; completes once it's on the phone.
+  Future<void> enqueue(String op, Map<String, dynamic> payload) => _save([
+    ...items,
+    {'id': const Uuid().v4(), 'op': op, 'payload': payload},
+  ]);
+
   /// Sends queued writes in order. Stops at the first failure and keeps it
-  /// (and everything after it) for next time.
-  Future<void> flush() async {
-    if (_flushing) return;
-    _flushing = true;
-    try {
-      while (items.isNotEmpty) {
-        final item = items.first;
-        try {
-          await _send(item['op'] as String, item['payload'] as Map);
-        } catch (e) {
-          debugPrint('Pando queue: ${item['op']} not sent yet ($e)');
-          return;
-        }
-        await _save(items.where((i) => i['id'] != item['id']).toList());
-        debugPrint('Pando queue: sent ${item['op']}');
+  /// (and everything after it) for next time. If a send is already running,
+  /// waits for it, so a caller that reads the server next sees the result.
+  Future<void> flush() =>
+      _flushing ??= _flushAll().whenComplete(() => _flushing = null);
+
+  Future<void> _flushAll() async {
+    while (items.isNotEmpty) {
+      final item = items.first;
+      try {
+        await _send(item['op'] as String, item['payload'] as Map);
+      } catch (e) {
+        debugPrint('Pando queue: ${item['op']} not sent yet ($e)');
+        return;
       }
-    } finally {
-      _flushing = false;
+      await _save(items.where((i) => i['id'] != item['id']).toList());
+      debugPrint('Pando queue: sent ${item['op']}');
     }
   }
 

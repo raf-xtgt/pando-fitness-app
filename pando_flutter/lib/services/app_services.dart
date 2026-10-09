@@ -4,12 +4,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../firebase_options.dart';
 import 'api_client.dart';
 import 'local_cache.dart';
+import 'local_db.dart';
 import 'pending_queue.dart';
 import 'push_service.dart';
+import 'recording_api_step_history.dart';
+import 'step_history.dart';
+import 'walk_recorder.dart';
 
 /// The app's long-lived services, created once at startup.
 class AppServices {
-  AppServices._(this.api, this.cache, this.queue, this.push);
+  AppServices._(
+    this.api,
+    this.cache,
+    this.queue,
+    this.push,
+    this.history,
+    this.recorder,
+  );
 
   static late final AppServices instance;
 
@@ -17,6 +28,8 @@ class AppServices {
   final LocalCache cache;
   final PendingQueue queue;
   final PushService push;
+  final StepHistory history;
+  final WalkRecorder recorder;
 
   /// Local pieces only; nothing here waits on the Pando server.
   static Future<void> init() async {
@@ -29,6 +42,15 @@ class AppServices {
     final queue = PendingQueue(prefs, api);
     final push = PushService(prefs, queue);
     await push.init();
-    instance = AppServices._(api, LocalCache(prefs), queue, push);
+    final history = RecordingApiStepHistory();
+    final recorder = WalkRecorder(await openLocalDb(api), history);
+    instance = AppServices._(
+      api,
+      LocalCache(prefs),
+      queue,
+      push,
+      history,
+      recorder,
+    );
   }
 }

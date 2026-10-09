@@ -51,7 +51,13 @@ class ActivityController extends ChangeNotifier {
   DateTime? endedAt;
   PassiveSignals? signals;
 
-  int get steps => _steps.stepsSoFar;
+  /// Set when finishing a walk Pando was killed in (from the step history).
+  int? _recoveredSteps;
+
+  int get steps => _recoveredSteps ?? _steps.stepsSoFar;
+
+  /// The step counter's value at Start (steps since boot).
+  Future<int> get startCount => _steps.baseline;
 
   /// Distance covered this session.
   double get metres => steps * strideMetres;
@@ -83,6 +89,27 @@ class ActivityController extends ChangeNotifier {
       goalMet: goalMet,
     );
     gait = Gait.standing;
+    state = goalMet ? ActivityState.celebrating : ActivityState.asking;
+    notifyListeners();
+  }
+
+  /// Finish walk: Pando was killed mid-walk, so the steps come from the
+  /// step history instead of the live counter. Goes straight to the same
+  /// states as [stop].
+  void stopRecovered({
+    required DateTime startedAt,
+    required DateTime endedAt,
+    required List<StepSample> timeline,
+  }) {
+    if (state != ActivityState.ready) return;
+    this.startedAt = startedAt;
+    this.endedAt = endedAt;
+    _recoveredSteps = timeline.isEmpty ? 0 : timeline.last.steps;
+    signals = PassiveSignals.compute(
+      timeline: timeline,
+      endedAt: endedAt,
+      goalMet: goalMet,
+    );
     state = goalMet ? ActivityState.celebrating : ActivityState.asking;
     notifyListeners();
   }

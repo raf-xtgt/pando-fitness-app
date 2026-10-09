@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:pando_client/pando_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart'
     hide UserProfile;
+import 'package:serverpod_database/serverpod_database.dart'
+    show ClientDatabaseSession;
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 
 /// Wraps the Serverpod client that `serverpod generate` builds from the
@@ -21,6 +23,12 @@ class ApiClient {
       ..authSessionManager = FlutterAuthSessionManager();
     await _client.auth.initialize();
   }
+
+  /// The on-phone SQLite database for the `database: client` models.
+  Future<ClientDatabaseSession> createLocalSession(
+    String path, {
+    bool isDebugMode = false,
+  }) => _client.createSession(path, isDebugMode: isDebugMode);
 
   /// Anonymous sign-in, once per install: one phone = one user. The session
   /// is kept on the phone, so later launches skip this call.

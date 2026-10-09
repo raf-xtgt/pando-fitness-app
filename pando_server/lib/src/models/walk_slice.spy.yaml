@@ -1,0 +1,13 @@
+### Steps in one 30 s slice of a walk, from the phone's step history.
+### Written at Stop. Phone only for now; synced to the server in slice 8.
+class: WalkSlice
+table: walk_slice
+database: client
+fields:
+  clientSessionId: String
+  startAt: DateTime
+  endAt: DateTime
+  steps: int
+indexes:
+  walk_slice_session_idx:
+    fields: clientSessionId, startAt

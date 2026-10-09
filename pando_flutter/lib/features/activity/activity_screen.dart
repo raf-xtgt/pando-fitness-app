@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 
 import '../../app/theme.dart';
+import '../../domain/gait_detector.dart';
 import '../../game/asset_manifest.dart';
 import '../../game/park_game.dart';
 import '../../services/app_services.dart';
 import '../../services/pending_queue.dart';
+import '../../services/step_counter_service.dart';
+import '../../services/step_history.dart';
+import '../../services/walk_recorder.dart';
 import '../celebration/celebration_overlay.dart';
 import 'activity_controller.dart';
 import 'distance_display.dart';
@@ -18,11 +22,18 @@ import 'mascot_bubble.dart';
 
 /// The park map with Flutter overlays on top. Owns the [ActivityController]
 /// and tells the game what to show; the game never sees steps.
+///
+/// With [recovered], this is **Finish walk**: Pando was killed mid-walk, so
+/// the screen skips live counting and goes straight to the Stop flow with
+/// the steps from the step history.
 class ActivityScreen extends StatefulWidget {
-  const ActivityScreen({super.key, required this.plan});
+  const ActivityScreen({super.key, required this.plan, this.recovered});
 
   /// Goal, stride, resume point and signs, from the server (or its cache).
   final ActivityPlan plan;
+
+  /// The walk left in the on-phone database when Pando was killed.
+  final WalkInProgress? recovered;
 
   @override
   State<ActivityScreen> createState() => _ActivityScreenState();
@@ -32,8 +43,17 @@ class _ActivityScreenState extends State<ActivityScreen> {
   late final ActivityController _controller;
   late final ParkGame _game;
 
+  final _services = AppServices.instance;
+
   /// Made on the phone, so a retried save is recognised by the server.
-  final String _clientSessionId = const Uuid().v4();
+  late final String _clientSessionId =
+      widget.recovered?.clientSessionId ?? const Uuid().v4();
+
+  /// The walk's row in the on-phone database is written.
+  Future<void> _recordingStarted = Future.value();
+
+  /// The walk's slices are read from the step history and kept.
+  Future<void> _slicesKept = Future.value();
 
   ActivityPlan get _plan => widget.plan;
 
@@ -48,7 +68,12 @@ class _ActivityScreenState extends State<ActivityScreen> {
       strideMetres: _plan.strideM,
       goalMetres: _plan.goalM,
     )..addListener(_onActivityChanged);
+    if (widget.recovered case final walk?) {
+      unawaited(_finishRecovered(walk));
+      return;
+    }
     _controller.start();
+    _recordingStarted = _startRecording();
     // Only the very first real walk. Steps already count underneath.
     if (_plan.isFirstActivity) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -76,8 +101,92 @@ class _ActivityScreenState extends State<ActivityScreen> {
       ..setGait(_controller.gait);
   }
 
+  /// Writes the walk to the on-phone database, so it survives Pando being
+  /// killed. The counter's start value follows with its first event.
+  Future<void> _startRecording() async {
+    final recorder = _services.recorder;
+    try {
+      await recorder.begin(
+        clientSessionId: _clientSessionId,
+        startedAt: _controller.startedAt,
+        goalSteps: _plan.goalSteps,
+        resumeMetres: _plan.resumeMetres,
+      );
+      unawaited(
+        _controller.startCount.then(
+          (count) => recorder.setStartCount(_clientSessionId, count),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Pando walk: not recorded on the phone ($e)');
+    }
+  }
+
+  /// Reads the walk's 30 s slices from the step history and keeps them.
+  Future<void> _keepSlices() async {
+    final startedAt = _controller.startedAt;
+    final endedAt = _controller.endedAt!;
+    debugPrint('Pando walk: counter ${_controller.steps} steps');
+    try {
+      await _services.recorder.recordSlices(
+        _clientSessionId,
+        startedAt,
+        endedAt,
+      );
+    } catch (e) {
+      debugPrint('Pando walk: no slices kept ($e)');
+    }
+  }
+
+  /// Finish walk: the steps come from the step history (or, without it,
+  /// from the step counter's value at Start), then the normal Stop flow.
+  Future<void> _finishRecovered(WalkInProgress walk) async {
+    final now = DateTime.now();
+    final startedAt = walk.startedAt.toLocal();
+    var slices = <WalkSlice>[];
+    try {
+      slices = await _services.recorder.recordSlices(
+        walk.clientSessionId,
+        startedAt,
+        now,
+      );
+    } on StepHistoryUnavailable catch (e) {
+      debugPrint('Pando walk: finishing without the step history ($e)');
+    }
+    var timeline = WalkRecorder.timeline(startedAt, slices);
+    final lastSteps = slices.where((s) => s.steps > 0).lastOrNull;
+    var endedAt = lastSteps?.endAt ?? now;
+    final startCount = walk.startCount;
+    if (slices.isEmpty && startCount != null) {
+      // A reboot resets the counter, so a smaller value can't be used.
+      final count = await currentStepCount();
+      if (count != null && count >= startCount) {
+        timeline = [
+          StepSample(startedAt, 0),
+          StepSample(now, count - startCount),
+        ];
+        endedAt = now;
+      }
+    }
+    await _game.loaded;
+    if (!mounted) return;
+    _controller.stopRecovered(
+      startedAt: startedAt,
+      endedAt: endedAt.toLocal(),
+      timeline: timeline,
+    );
+    await _afterStop();
+  }
+
   Future<void> _stop() async {
     _controller.stop();
+    _slicesKept = _keepSlices();
+    await _afterStop();
+  }
+
+  /// Sign, then the celebration if the goal was met. The feel question
+  /// follows (the controller is in `asking` afterwards).
+  Future<void> _afterStop() async {
     _game.placeSign(_plan.resumeMetres + _controller.metres);
     if (_controller.state == ActivityState.celebrating) {
       await CelebrationOverlay.show(
@@ -100,7 +209,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
   /// Saves on the phone first, queues the server save, and goes Home.
   Future<void> _finish(Feel? feel) async {
     _controller.finish();
-    final services = AppServices.instance;
+    final services = _services;
     final input = SessionInput(
       clientSessionId: _clientSessionId,
       startedAt: _controller.startedAt.toUtc(),
@@ -120,9 +229,16 @@ class _ActivityScreenState extends State<ActivityScreen> {
         isFirstActivity: false,
       ),
     );
-    unawaited(
-      services.queue.add(PendingQueue.saveSessionOp, input.toJson()),
-    );
+    await services.queue.enqueue(PendingQueue.saveSessionOp, input.toJson());
+    unawaited(services.queue.flush());
+    // The session is safe in the queue, so the walk is no longer in progress.
+    try {
+      await _recordingStarted;
+      await _slicesKept;
+      await services.recorder.end(_clientSessionId);
+    } catch (e) {
+      debugPrint('Pando walk: walk in progress not cleared ($e)');
+    }
     if (mounted) Navigator.of(context).pop();
   }
 

@@ -28,10 +28,14 @@ class _HomeScreenState extends State<HomeScreen> {
   List<SessionRowData> _rows = [];
   Timer? _ticker;
 
+  /// A walk Pando was killed in the middle of (from the on-phone database).
+  WalkInProgress? _inProgress;
+
   @override
   void initState() {
     super.initState();
     _rows = _buildRows();
+    unawaited(_loadInProgress());
     unawaited(_refresh());
     _ticker = Timer.periodic(HomeScreen.rowTick, (_) => setState(() {}));
     // Pando was opened by tapping a report notification.
@@ -80,6 +84,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() => _rows = _buildRows());
   }
 
+  Future<void> _loadInProgress() async {
+    final walk = await _services.recorder.inProgress();
+    if (mounted) setState(() => _inProgress = walk);
+  }
+
   Future<void> _start() async {
     setState(() => _message = null);
     if (_services.cache.plan == null) await _refresh();
@@ -99,9 +108,45 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => _message = 'App needs permission to continue');
       return;
     }
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => ActivityScreen(plan: plan)),
+    // The phone keeps its own step history from now on (screen off too).
+    unawaited(
+      _services.history.ensureRecording().catchError(
+        (Object e) => debugPrint('Pando walk: step history not recording ($e)'),
+      ),
     );
+    await _openActivity(ActivityScreen(plan: plan));
+  }
+
+  /// Finish walk: the normal Stop flow for the walk left in progress, with
+  /// the goal and start point it had.
+  Future<void> _finishWalk(WalkInProgress walk) async {
+    final plan = _services.cache.plan;
+    if (plan == null) {
+      setState(
+        () => _message =
+            'Pando needs a connection to finish this walk. '
+            'Please try again with signal.',
+      );
+      return;
+    }
+    await _openActivity(
+      ActivityScreen(
+        plan: plan.copyWith(
+          goalSteps: walk.goalSteps,
+          goalM: walk.goalSteps * plan.strideM,
+          resumeMetres: walk.resumeMetres,
+        ),
+        recovered: walk,
+      ),
+    );
+  }
+
+  Future<void> _openActivity(ActivityScreen screen) async {
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => screen));
+    if (!mounted) return;
+    await _loadInProgress();
     if (!mounted) return;
     setState(() => _rows = _buildRows());
     unawaited(_refresh());
@@ -162,28 +207,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              Center(
-                child: Semantics(
-                  button: true,
-                  label: 'Start an activity',
-                  child: GestureDetector(
-                    onTap: _start,
-                    child: const WobblyBox(
-                      seed: 3,
-                      strokeWidth: 3,
-                      padding: EdgeInsets.fromLTRB(44, 8, 44, 18),
-                      child: Text(
-                        '+',
-                        style: TextStyle(
-                          fontSize: 88,
-                          height: 1,
-                          fontWeight: FontWeight.w600,
+              if (_inProgress case final walk?)
+                _WalkInProgressCard(onFinish: () => _finishWalk(walk))
+              else
+                Center(
+                  child: Semantics(
+                    button: true,
+                    label: 'Start an activity',
+                    child: GestureDetector(
+                      onTap: _start,
+                      child: const WobblyBox(
+                        seed: 3,
+                        strokeWidth: 3,
+                        padding: EdgeInsets.fromLTRB(44, 8, 44, 18),
+                        child: Text(
+                          '+',
+                          style: TextStyle(
+                            fontSize: 88,
+                            height: 1,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
               if (_message != null) ...[
                 const SizedBox(height: 20),
                 Text(
@@ -217,6 +265,49 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Shown instead of the **+** when Pando was killed mid-walk.
+class _WalkInProgressCard extends StatelessWidget {
+  const _WalkInProgressCard({required this.onFinish});
+
+  final VoidCallback onFinish;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return Column(
+      children: [
+        Text(
+          'You have a walk in progress',
+          textAlign: TextAlign.center,
+          style: text.titleLarge!.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Your phone kept counting. Finish it to save your steps.',
+          textAlign: TextAlign.center,
+          style: text.bodyLarge,
+        ),
+        const SizedBox(height: 20),
+        Semantics(
+          button: true,
+          child: GestureDetector(
+            onTap: onFinish,
+            child: const WobblyBox(
+              seed: 7,
+              strokeWidth: 2.6,
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+              child: Text(
+                'Finish walk',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
