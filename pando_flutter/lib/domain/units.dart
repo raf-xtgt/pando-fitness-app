@@ -18,3 +18,8 @@ int metresToInches(double metres) => (metres / metresPerInch).round().clamp(
 
 /// `5 ft 7 in`
 String formatFeetInches(int inches) => '${inches ~/ 12} ft ${inches % 12} in';
+
+/// A walk's distance: `210 m` below a kilometre, else `2.4 km`.
+String formatWalkDistance(double metres) => metres >= 1000
+    ? '${(metres / 1000).toStringAsFixed(1)} km'
+    : '${metres.round()} m';

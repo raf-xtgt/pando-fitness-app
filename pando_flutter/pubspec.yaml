@@ -47,6 +47,7 @@ dependencies:
   serverpod_database: 4.0.4
   serverpod_flutter: 4.0.4
   serverpod_offline_sync_client: 0.0.10
+  share_plus: ^13.3.1
   shared_preferences: ^2.5.6
   uuid: ^4.6.0
   webview_flutter: ^4.14.1

@@ -30,6 +30,18 @@
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <title>Pando replay</title>
+
+  <!-- Link card for X, WhatsApp and others. tool/build_replay_web.py fills
+       in the server's public address (an absolute image URL is required). -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Pando">
+  <meta property="og:title" content="A walk with Pando">
+  <meta property="og:description" content="Watch this walk, replayed on the park.">
+  <meta property="og:image" content="__PANDO_PUBLIC_URL__/replay/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Pando mascot and the words: A walk, replayed on the park.">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="manifest" href="manifest.json">
   <!-- Shown while Flutter starts (the replay page's first seconds); the same
        look as the app's ReplayLoading widget. Removed on Flutter's first

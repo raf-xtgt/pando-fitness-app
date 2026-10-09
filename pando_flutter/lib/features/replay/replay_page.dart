@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 import 'package:pando_shared/pando_shared.dart';
 
+import '../../domain/units.dart';
 import 'replay_loading.dart';
 import 'replay_player.dart';
 
@@ -61,7 +62,7 @@ class _ReplayPageState extends State<ReplayPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'A walk of ${_distance(replay.distanceM)} '
+                        'A walk of ${formatWalkDistance(replay.distanceM)} '
                         'in ${_minutes(replay.realS)}, replayed on the park.',
                         textAlign: TextAlign.center,
                         style: text.bodyLarge,
@@ -77,10 +78,6 @@ class _ReplayPageState extends State<ReplayPage> {
       ),
     );
   }
-
-  static String _distance(double metres) => metres >= 1000
-      ? '${(metres / 1000).toStringAsFixed(1)} km'
-      : '${metres.round()} m';
 
   static String _minutes(double seconds) {
     final minutes = (seconds / 60).round();

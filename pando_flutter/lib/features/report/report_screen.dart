@@ -4,6 +4,7 @@ import 'package:pando_client/pando_client.dart';
 import '../../app/theme.dart';
 import '../../services/app_services.dart';
 import '../home/session_row.dart';
+import '../replay/replay_share.dart';
 import '../replay/replay_view.dart';
 
 /// The delayed report for one session: a warm message, the walk's replay
@@ -102,7 +103,7 @@ class _ReportBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        _Replay(replayId: report.replayId),
+        _Replay(replayId: report.replayId, distanceM: report.distanceM),
         const SizedBox(height: 24),
         _Line(label: 'This walk', value: '${report.distanceM.round()} m'),
         _Line(
@@ -125,9 +126,10 @@ class _ReportBody extends StatelessWidget {
 
 /// The walk replayed on the park, in a fixed-height frame.
 class _Replay extends StatelessWidget {
-  const _Replay({required this.replayId});
+  const _Replay({required this.replayId, required this.distanceM});
 
   final UuidValue? replayId;
+  final double distanceM;
 
   static const double height = 380;
 
@@ -144,19 +146,52 @@ class _Replay extends StatelessWidget {
         ),
       );
     }
-    return WobblyBox(
-      seed: 23,
-      strokeWidth: 2.6,
-      padding: const EdgeInsets.all(6),
-      child: SizedBox(
-        height: height,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: ReplayView(
-            url: AppServices.instance.api.replayPage(id),
+    final link = AppServices.instance.api.replayPage(id);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        WobblyBox(
+          seed: 23,
+          strokeWidth: 2.6,
+          padding: const EdgeInsets.all(6),
+          child: SizedBox(
+            height: height,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: ReplayView(url: link),
+            ),
           ),
         ),
-      ),
+        const SizedBox(height: 14),
+        Center(
+          child: Semantics(
+            button: true,
+            label: 'Share your walk',
+            child: GestureDetector(
+              onTap: () => shareReplay(distanceM, link),
+              child: const WobblyBox(
+                seed: 29,
+                strokeWidth: 2.6,
+                padding: EdgeInsets.symmetric(horizontal: 26, vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.share, color: PandoColors.ink),
+                    SizedBox(width: 8),
+                    Text(
+                      'Share',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
