@@ -23,6 +23,7 @@ import '../auth/anonymous_idp_endpoint.dart' as _in0zita6;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/demo_endpoint.dart' as _irow5ity;
 import '../endpoints/profile_endpoint.dart' as _i2cx2pww;
+import '../endpoints/replay_endpoint.dart' as _i50vj1z9;
 import '../endpoints/session_endpoint.dart' as _ih5ivktc;
 export 'future_calls.dart' show ServerpodFutureCallsGetter;
 
@@ -52,6 +53,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'profile',
+          null,
+        ),
+      'replay': _i50vj1z9.ReplayEndpoint()
+        ..initialize(
+          server,
+          'replay',
           null,
         ),
       'session': _ih5ivktc.SessionEndpoint()
@@ -180,6 +187,30 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['token'],
                   ),
+        ),
+      },
+    );
+    connectors['replay'] = _is.EndpointConnector(
+      name: 'replay',
+      endpoint: endpoints['replay']!,
+      methodConnectors: {
+        'get': _is.MethodConnector(
+          name: 'get',
+          params: {
+            'replayId': _is.ParameterDescription(
+              name: 'replayId',
+              type: _is.getType<_is.UuidValue>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['replay'] as _i50vj1z9.ReplayEndpoint).get(
+                session,
+                params['replayId'],
+              ),
         ),
       },
     );

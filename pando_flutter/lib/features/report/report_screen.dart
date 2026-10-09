@@ -4,8 +4,10 @@ import 'package:pando_client/pando_client.dart';
 import '../../app/theme.dart';
 import '../../services/app_services.dart';
 import '../home/session_row.dart';
+import '../replay/replay_view.dart';
 
-/// The delayed report for one session: a warm message, then the summary.
+/// The delayed report for one session: a warm message, the walk's replay
+/// (or "replay on its way"), then the summary.
 /// Opened from the notification or a Home row; ✕ goes back.
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key, required this.sessionId});
@@ -99,7 +101,9 @@ class _ReportBody extends StatelessWidget {
             style: text.titleLarge!.copyWith(height: 1.35),
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 24),
+        _Replay(replayId: report.replayId),
+        const SizedBox(height: 24),
         _Line(label: 'This walk', value: '${report.distanceM.round()} m'),
         _Line(
           label: 'All your walks',
@@ -115,6 +119,44 @@ class _ReportBody extends StatelessWidget {
           valueColor: report.extraM > 0 ? PandoColors.fire : null,
         ),
       ],
+    );
+  }
+}
+
+/// The walk replayed on the park, in a fixed-height frame.
+class _Replay extends StatelessWidget {
+  const _Replay({required this.replayId});
+
+  final UuidValue? replayId;
+
+  static const double height = 380;
+
+  @override
+  Widget build(BuildContext context) {
+    final id = replayId;
+    if (id == null) {
+      return WobblyBox(
+        seed: 23,
+        padding: const EdgeInsets.all(18),
+        child: Text(
+          'Your replay is on its way. Open this report again in a moment.',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      );
+    }
+    return WobblyBox(
+      seed: 23,
+      strokeWidth: 2.6,
+      padding: const EdgeInsets.all(6),
+      child: SizedBox(
+        height: height,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: ReplayView(
+            url: AppServices.instance.api.replayPage(id),
+          ),
+        ),
+      ),
     );
   }
 }

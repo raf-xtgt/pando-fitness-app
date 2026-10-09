@@ -12,6 +12,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'src/notifications/cloud_tasks_alarm.dart';
 import 'src/notifications/fcm_sender.dart';
 import 'src/pando_services.dart';
+import 'src/replays/replay_route.dart';
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
@@ -50,6 +51,7 @@ void run(List<String> args) async {
   );
 
   await _setUpPando(pod);
+  addReplayPage(pod);
 
   // Start the server.
   await pod.start();

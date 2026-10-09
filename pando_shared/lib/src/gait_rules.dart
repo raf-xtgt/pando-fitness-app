@@ -4,8 +4,10 @@ import 'generated/protocol.dart';
 /// live map (`GaitDetector` in the app) and the replay classify the same way.
 /// Tuned in testing.
 abstract final class GaitRules {
-  /// At or above this cadence (steps per minute) the walker runs.
-  static const double runningStepsPerMinute = 140;
+  /// At or above this cadence (steps per minute) the walker runs. 130, not
+  /// 140: an indoor jog at ~132/min should count as running (learner,
+  /// 2026-10-09); re-check after the park test.
+  static const double runningStepsPerMinute = 130;
 
   /// Fewer than one step in this window means standing.
   static const Duration standingWindow = Duration(seconds: 3);

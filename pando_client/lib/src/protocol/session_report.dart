@@ -23,6 +23,7 @@ abstract class SessionReport
     required this.totalDistanceAllM,
     required this.goalMet,
     required this.extraM,
+    this.replayId,
   });
 
   factory SessionReport({
@@ -33,6 +34,7 @@ abstract class SessionReport
     required double totalDistanceAllM,
     required bool goalMet,
     required double extraM,
+    _isc.UuidValue? replayId,
   }) = _SessionReportImpl;
 
   factory SessionReport.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -47,6 +49,9 @@ abstract class SessionReport
           .toDouble(),
       goalMet: _isc.BoolJsonExtension.fromJson(jsonSerialization['goalMet']),
       extraM: (jsonSerialization['extraM'] as num).toDouble(),
+      replayId: jsonSerialization['replayId'] == null
+          ? null
+          : _isc.UuidValueJsonExtension.fromJson(jsonSerialization['replayId']),
     );
   }
 
@@ -65,6 +70,9 @@ abstract class SessionReport
 
   double extraM;
 
+  /// Null until the replay is built ("replay on its way").
+  _isc.UuidValue? replayId;
+
   /// Returns a shallow copy of this [SessionReport]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -76,6 +84,7 @@ abstract class SessionReport
     double? totalDistanceAllM,
     bool? goalMet,
     double? extraM,
+    _isc.UuidValue? replayId,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -88,6 +97,7 @@ abstract class SessionReport
       'totalDistanceAllM': totalDistanceAllM,
       'goalMet': goalMet,
       'extraM': extraM,
+      if (replayId != null) 'replayId': replayId?.toJson(),
     };
   }
 
@@ -102,6 +112,7 @@ abstract class SessionReport
       'totalDistanceAllM': totalDistanceAllM,
       'goalMet': goalMet,
       'extraM': extraM,
+      if (replayId != null) 'replayId': replayId?.toJson(),
     };
   }
 
@@ -110,6 +121,8 @@ abstract class SessionReport
     return _isc.SerializationManager.encode(this);
   }
 }
+
+class _Undefined {}
 
 class _SessionReportImpl extends SessionReport {
   _SessionReportImpl({
@@ -120,6 +133,7 @@ class _SessionReportImpl extends SessionReport {
     required double totalDistanceAllM,
     required bool goalMet,
     required double extraM,
+    _isc.UuidValue? replayId,
   }) : super._(
          sessionId: sessionId,
          endedAt: endedAt,
@@ -128,6 +142,7 @@ class _SessionReportImpl extends SessionReport {
          totalDistanceAllM: totalDistanceAllM,
          goalMet: goalMet,
          extraM: extraM,
+         replayId: replayId,
        );
 
   /// Returns a shallow copy of this [SessionReport]
@@ -142,6 +157,7 @@ class _SessionReportImpl extends SessionReport {
     double? totalDistanceAllM,
     bool? goalMet,
     double? extraM,
+    Object? replayId = _Undefined,
   }) {
     return SessionReport(
       sessionId: sessionId ?? this.sessionId,
@@ -151,6 +167,7 @@ class _SessionReportImpl extends SessionReport {
       totalDistanceAllM: totalDistanceAllM ?? this.totalDistanceAllM,
       goalMet: goalMet ?? this.goalMet,
       extraM: extraM ?? this.extraM,
+      replayId: replayId is _isc.UuidValue? ? replayId : this.replayId,
     );
   }
 }

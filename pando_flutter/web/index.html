@@ -18,21 +18,54 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="A walk with Pando, replayed on the park.">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="pando_flutter">
+  <meta name="apple-mobile-web-app-title" content="Pando">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>pando_flutter</title>
+  <title>Pando replay</title>
   <link rel="manifest" href="manifest.json">
+  <!-- Shown while Flutter starts (the replay page's first seconds); the same
+       look as the app's ReplayLoading widget. Removed on Flutter's first
+       frame. -->
+  <style>
+    html, body { margin: 0; height: 100%; background: #F3EDE2; }
+    #pando-loading {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      font-family: Mulish, system-ui, sans-serif; font-size: 16px;
+      color: #2A2622;
+    }
+    #pando-loading img {
+      width: 120px; height: 120px;
+      animation: pando-float 2.8s ease-in-out infinite;
+    }
+    @keyframes pando-float {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-5px) rotate(2deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #pando-loading img { animation: none; }
+    }
+  </style>
 </head>
 <body>
+  <div id="pando-loading" aria-live="polite">
+    <img src="assets/assets/art/mascot/mascot_still.png" alt="">
+    <div>Loading your walk…</div>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var loading = document.getElementById('pando-loading');
+      if (loading) loading.remove();
+    });
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

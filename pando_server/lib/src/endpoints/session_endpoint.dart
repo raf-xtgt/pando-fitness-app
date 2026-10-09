@@ -6,6 +6,7 @@ import '../generated/protocol.dart';
 import '../generated/future_calls.dart';
 import '../goals/goal_calculator.dart';
 import '../pando_services.dart';
+import '../replays/replay_store.dart';
 import 'caller.dart';
 
 /// Activity sessions: what to aim for next, saving a finished walk, and the
@@ -117,10 +118,13 @@ class SessionEndpoint extends Endpoint {
   /// The report for one of the caller's sessions.
   Future<SessionReport> report(Session session, int sessionId) async {
     final profile = await session.requireCallerProfile();
-    final s = await ActivitySession.db.findById(session, sessionId);
-    if (s == null || s.profileId != profile.id) {
+    final found = await ActivitySession.db.findById(session, sessionId);
+    if (found == null || found.profileId != profile.id) {
       throw StateError('No such session');
     }
+    // Normally built by the report future call; this catches slices that
+    // synced late.
+    final s = await ensureReplay(session, found);
     return SessionReport(
       sessionId: sessionId,
       endedAt: s.endedAt,
@@ -130,6 +134,7 @@ class SessionEndpoint extends Endpoint {
       totalDistanceAllM: s.endPathM,
       goalMet: s.goalMet,
       extraM: s.extraM,
+      replayId: s.replayId,
     );
   }
 

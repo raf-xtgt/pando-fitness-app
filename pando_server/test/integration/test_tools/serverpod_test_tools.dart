@@ -21,6 +21,7 @@ import 'package:pando_server/src/generated/future_calls_generated_models/send_re
 import 'package:pando_server/src/generated/session_input.dart' as _ioouzq3l;
 import 'package:pando_server/src/generated/session_report.dart' as _iyejdiwy;
 import 'package:pando_server/src/generated/user_profile.dart' as _ism2ds39;
+import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -168,6 +169,8 @@ class TestEndpoints {
 
   late final _ProfileEndpoint profile;
 
+  late final _ReplayEndpoint replay;
+
   late final _SessionEndpoint session;
 }
 
@@ -191,6 +194,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     profile = _ProfileEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    replay = _ReplayEndpoint(
       endpoints,
       serializationManager,
     );
@@ -425,6 +432,48 @@ class _ProfileEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _ReplayEndpoint {
+  _ReplayEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ip2bu2mq.Replay?> get(
+    _ist.TestSessionBuilder sessionBuilder,
+    _is.UuidValue replayId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'replay',
+            method: 'get',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'replay',
+          methodName: 'get',
+          parameters: _ist.testObjectToJson({'replayId': replayId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ip2bu2mq.Replay?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

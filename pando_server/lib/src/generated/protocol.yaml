@@ -8,6 +8,8 @@ profile:
   - get:
   - saveHeight:
   - registerPushToken:
+replay:
+  - get:
 session:
   - plan:
   - save:

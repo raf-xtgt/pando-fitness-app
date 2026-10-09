@@ -8,6 +8,9 @@ build/
 # Ignore the flutter web app directory
 web/app
 
+# Replay page build (contains the licensed art; see CREDITS.md)
+web/replay
+
 # Directory created by dartdoc
 doc/api/
 

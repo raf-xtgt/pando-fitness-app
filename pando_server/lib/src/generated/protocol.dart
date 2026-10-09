@@ -181,6 +181,18 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'bool',
           columnDefault: 'false',
         ),
+        _isp.ColumnDefinition(
+          name: 'replayId',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: true,
+          dartType: 'UuidValue?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'replay',
+          columnType: _isp.ColumnType.json,
+          isNullable: true,
+          dartType: 'pando_shared:Replay?',
+        ),
       ],
       foreignKeys: [
         _isp.ForeignKeyDefinition(
@@ -202,6 +214,19 @@ class Protocol extends _is.DatabaseSerializationManager {
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
               definition: 'clientSessionId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'activity_session_replay_id_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'replayId',
             ),
           ],
           type: 'btree',

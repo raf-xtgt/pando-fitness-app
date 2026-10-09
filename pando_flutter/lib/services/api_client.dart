@@ -16,15 +16,23 @@ class ApiClient {
 
   late final Client _client;
 
+  /// The server's base URL, ending in `/`.
+  late final String serverUrl;
+
   /// Server URL: `--dart-define=SERVER_URL=...`, else `assets/config.json`.
   Future<void> init() async {
     final url = await getServerUrl();
+    serverUrl = url.endsWith('/') ? url : '$url/';
     debugPrint('Pando server: $url');
     _client = Client(url, connectionTimeout: callTimeout)
       ..connectivityMonitor = FlutterConnectivityMonitor()
       ..authSessionManager = FlutterAuthSessionManager();
     await _client.auth.initialize();
   }
+
+  /// The public replay page for a walk (served by the Pando server).
+  Uri replayPage(UuidValue replayId) =>
+      Uri.parse('${serverUrl}replay/$replayId');
 
   /// A one-shot offline sync gives up after this long.
   static const Duration syncTimeout = Duration(seconds: 30);

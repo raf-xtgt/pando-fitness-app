@@ -2,4 +2,5 @@
 library;
 
 export 'src/gait_rules.dart';
+export 'src/replay_builder.dart';
 export 'src/generated/protocol.dart';

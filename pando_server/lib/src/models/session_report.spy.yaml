@@ -9,3 +9,5 @@ fields:
   totalDistanceAllM: double
   goalMet: bool
   extraM: double
+  ### Null until the replay is built ("replay on its way").
+  replayId: UuidValue?

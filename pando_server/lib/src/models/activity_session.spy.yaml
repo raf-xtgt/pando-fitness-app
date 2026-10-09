@@ -30,9 +30,17 @@ fields:
   notificationSentAt: DateTime?
   ### Demo-only history (slice 5).
   isSeeded: bool, default=false
+  ### The walk's replay (Hackathon Round), built from the synced walk slices
+  ### when the report is due. `replayId` is the unguessable id in the public
+  ### link `/replay/<replayId>`.
+  replayId: UuidValue?
+  replay: Replay?
 indexes:
   activity_session_client_id_idx:
     fields: clientSessionId
+    unique: true
+  activity_session_replay_id_idx:
+    fields: replayId
     unique: true
   activity_session_profile_idx:
     fields: profileId, endedAt

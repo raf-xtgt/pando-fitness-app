@@ -68,6 +68,12 @@ class Runner extends SpriteAnimationGroupComponent<String>
     _place();
   }
 
+  /// Shows the runner at [pixels] at once (the replay).
+  void jumpTo(double pixels) {
+    displayedPixels = pixels;
+    targetPixels = pixels;
+  }
+
   @override
   void update(double dt) {
     final gap = targetPixels - displayedPixels;

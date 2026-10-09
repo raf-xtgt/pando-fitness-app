@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:pando_client/src/protocol/protocol.dart' as _i1g0f8g9;
+import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'feel.dart' as _ifrvopus;
 
@@ -38,6 +40,8 @@ abstract class ActivitySession
     required this.reportReadyAt,
     this.notificationSentAt,
     bool? isSeeded,
+    this.replayId,
+    this.replay,
   }) : isSeeded = isSeeded ?? false;
 
   factory ActivitySession({
@@ -62,6 +66,8 @@ abstract class ActivitySession
     required DateTime reportReadyAt,
     DateTime? notificationSentAt,
     bool? isSeeded,
+    _isc.UuidValue? replayId,
+    _ip2bu2mq.Replay? replay,
   }) = _ActivitySessionImpl;
 
   factory ActivitySession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -105,6 +111,14 @@ abstract class ActivitySession
       isSeeded: jsonSerialization['isSeeded'] == null
           ? null
           : _isc.BoolJsonExtension.fromJson(jsonSerialization['isSeeded']),
+      replayId: jsonSerialization['replayId'] == null
+          ? null
+          : _isc.UuidValueJsonExtension.fromJson(jsonSerialization['replayId']),
+      replay: jsonSerialization['replay'] == null
+          ? null
+          : _i1g0f8g9.Protocol().deserialize<_ip2bu2mq.Replay>(
+              jsonSerialization['replay'],
+            ),
     );
   }
 
@@ -161,6 +175,13 @@ abstract class ActivitySession
   /// Demo-only history (slice 5).
   bool isSeeded;
 
+  /// The walk's replay (Hackathon Round), built from the synced walk slices
+  /// when the report is due. `replayId` is the unguessable id in the public
+  /// link `/replay/<replayId>`.
+  _isc.UuidValue? replayId;
+
+  _ip2bu2mq.Replay? replay;
+
   /// Returns a shallow copy of this [ActivitySession]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -186,6 +207,8 @@ abstract class ActivitySession
     DateTime? reportReadyAt,
     DateTime? notificationSentAt,
     bool? isSeeded,
+    _isc.UuidValue? replayId,
+    _ip2bu2mq.Replay? replay,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -213,6 +236,8 @@ abstract class ActivitySession
       if (notificationSentAt != null)
         'notificationSentAt': notificationSentAt?.toJson(),
       'isSeeded': isSeeded,
+      if (replayId != null) 'replayId': replayId?.toJson(),
+      if (replay != null) 'replay': replay?.toJson(),
     };
   }
 
@@ -242,6 +267,8 @@ abstract class ActivitySession
       if (notificationSentAt != null)
         'notificationSentAt': notificationSentAt?.toJson(),
       'isSeeded': isSeeded,
+      if (replayId != null) 'replayId': replayId?.toJson(),
+      if (replay != null) 'replay': replay?.toJsonForProtocol(),
     };
   }
 
@@ -276,6 +303,8 @@ class _ActivitySessionImpl extends ActivitySession {
     required DateTime reportReadyAt,
     DateTime? notificationSentAt,
     bool? isSeeded,
+    _isc.UuidValue? replayId,
+    _ip2bu2mq.Replay? replay,
   }) : super._(
          id: id,
          profileId: profileId,
@@ -298,6 +327,8 @@ class _ActivitySessionImpl extends ActivitySession {
          reportReadyAt: reportReadyAt,
          notificationSentAt: notificationSentAt,
          isSeeded: isSeeded,
+         replayId: replayId,
+         replay: replay,
        );
 
   /// Returns a shallow copy of this [ActivitySession]
@@ -326,6 +357,8 @@ class _ActivitySessionImpl extends ActivitySession {
     DateTime? reportReadyAt,
     Object? notificationSentAt = _Undefined,
     bool? isSeeded,
+    Object? replayId = _Undefined,
+    Object? replay = _Undefined,
   }) {
     return ActivitySession(
       id: id is int? ? id : this.id,
@@ -353,6 +386,8 @@ class _ActivitySessionImpl extends ActivitySession {
           ? notificationSentAt
           : this.notificationSentAt,
       isSeeded: isSeeded ?? this.isSeeded,
+      replayId: replayId is _isc.UuidValue? ? replayId : this.replayId,
+      replay: replay is _ip2bu2mq.Replay? ? replay : this.replay?.copyWith(),
     );
   }
 }

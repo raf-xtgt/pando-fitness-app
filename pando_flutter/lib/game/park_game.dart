@@ -18,7 +18,8 @@ export 'components/mascot.dart' show MascotMove;
 
 /// The isometric park. This is the map boundary: the Activity screen only
 /// talks to the game through [setDistance], [setGait], [placeSign] and
-/// [playMascot] (plus the start values passed in). The game knows nothing about steps or
+/// [playMascot] (plus the start values passed in); the replay uses
+/// [showAt]. The game knows nothing about steps or
 /// the server.
 class ParkGame extends FlameGame {
   ParkGame({this.resumeMetres = 0, this.signMetres = const [0]});
@@ -96,6 +97,15 @@ class ParkGame extends FlameGame {
   void setGait(Gait gait) {
     if (!isLoaded) return;
     _runner.gait = gait;
+  }
+
+  /// Replay: puts the runner exactly at [metres] with [gait], no glide (the
+  /// replay moves faster than the live glide could follow).
+  void showAt(double metres, Gait gait) {
+    if (!isLoaded) return;
+    _runner
+      ..jumpTo(metres * pixelsPerMetre)
+      ..gait = gait;
   }
 
   /// Puts a wooden sign at a journey position (metres), e.g. on Stop.

@@ -17,6 +17,7 @@ import 'package:pando_client/src/protocol/activity_session.dart' as _itsbeekw;
 import 'package:pando_client/src/protocol/session_input.dart' as _i6unmrz6;
 import 'package:pando_client/src/protocol/session_report.dart' as _i8rxrde7;
 import 'package:pando_client/src/protocol/user_profile.dart' as _i7vdt7l1;
+import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
@@ -145,6 +146,25 @@ class EndpointProfile extends _isc.EndpointRef {
       );
 }
 
+/// The public replay page (`/replay/<replayId>`) reads its replay here. No
+/// login: whoever holds the unguessable link can watch it. Returns only the
+/// replay itself, nothing else about the user or the walk.
+/// {@category Endpoint}
+class EndpointReplay extends _isc.EndpointRef {
+  EndpointReplay(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'replay';
+
+  /// The replay with this id, or null if there is none.
+  _ida.Future<_ip2bu2mq.Replay?> get(_isc.UuidValue replayId) =>
+      caller.callServerEndpoint<_ip2bu2mq.Replay?>(
+        'replay',
+        'get',
+        {'replayId': replayId},
+      );
+}
+
 /// Activity sessions: what to aim for next, saving a finished walk, and the
 /// history for Home. Every call is scoped to the signed-in user.
 /// {@category Endpoint}
@@ -233,6 +253,7 @@ class Client extends _isc.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     demo = EndpointDemo(this);
     profile = EndpointProfile(this);
+    replay = EndpointReplay(this);
     session = EndpointSession(this);
     modules = Modules(this);
   }
@@ -245,6 +266,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointProfile profile;
 
+  late final EndpointReplay replay;
+
   late final EndpointSession session;
 
   late final Modules modules;
@@ -255,6 +278,7 @@ class Client extends _isc.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'demo': demo,
     'profile': profile,
+    'replay': replay,
     'session': session,
   };
 

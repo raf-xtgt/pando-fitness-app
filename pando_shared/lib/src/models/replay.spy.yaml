@@ -1,0 +1,14 @@
+### A walk as a short animation on the park: built on the server from the
+### synced walk slices, stored with the session, and played in the report
+### and on the public replay page. Holds nothing about the user.
+class: Replay
+fields:
+  ### Journey positions (metres along the endless path) of the start and end
+  ### signs.
+  startPathM: double
+  endPathM: double
+  distanceM: double
+  ### Real length of the walk, and of the replay (1 s per minute, 15–90 s).
+  realS: double
+  durationS: double
+  segments: List<ReplaySegment>

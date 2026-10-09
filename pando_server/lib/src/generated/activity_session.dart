@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:pando_server/src/generated/protocol.dart' as _iteljug8;
+import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'feel.dart' as _ifrvopus;
 
@@ -38,6 +40,8 @@ abstract class ActivitySession
     required this.reportReadyAt,
     this.notificationSentAt,
     bool? isSeeded,
+    this.replayId,
+    this.replay,
   }) : isSeeded = isSeeded ?? false;
 
   factory ActivitySession({
@@ -62,6 +66,8 @@ abstract class ActivitySession
     required DateTime reportReadyAt,
     DateTime? notificationSentAt,
     bool? isSeeded,
+    _is.UuidValue? replayId,
+    _ip2bu2mq.Replay? replay,
   }) = _ActivitySessionImpl;
 
   factory ActivitySession.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -103,6 +109,14 @@ abstract class ActivitySession
       isSeeded: jsonSerialization['isSeeded'] == null
           ? null
           : _is.BoolJsonExtension.fromJson(jsonSerialization['isSeeded']),
+      replayId: jsonSerialization['replayId'] == null
+          ? null
+          : _is.UuidValueJsonExtension.fromJson(jsonSerialization['replayId']),
+      replay: jsonSerialization['replay'] == null
+          ? null
+          : _iteljug8.Protocol().deserialize<_ip2bu2mq.Replay>(
+              jsonSerialization['replay'],
+            ),
     );
   }
 
@@ -161,6 +175,13 @@ abstract class ActivitySession
   /// Demo-only history (slice 5).
   bool isSeeded;
 
+  /// The walk's replay (Hackathon Round), built from the synced walk slices
+  /// when the report is due. `replayId` is the unguessable id in the public
+  /// link `/replay/<replayId>`.
+  _is.UuidValue? replayId;
+
+  _ip2bu2mq.Replay? replay;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -189,6 +210,8 @@ abstract class ActivitySession
     DateTime? reportReadyAt,
     DateTime? notificationSentAt,
     bool? isSeeded,
+    _is.UuidValue? replayId,
+    _ip2bu2mq.Replay? replay,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -216,6 +239,8 @@ abstract class ActivitySession
       if (notificationSentAt != null)
         'notificationSentAt': notificationSentAt?.toJson(),
       'isSeeded': isSeeded,
+      if (replayId != null) 'replayId': replayId?.toJson(),
+      if (replay != null) 'replay': replay?.toJson(),
     };
   }
 
@@ -245,6 +270,8 @@ abstract class ActivitySession
       if (notificationSentAt != null)
         'notificationSentAt': notificationSentAt?.toJson(),
       'isSeeded': isSeeded,
+      if (replayId != null) 'replayId': replayId?.toJson(),
+      if (replay != null) 'replay': replay?.toJsonForProtocol(),
     };
   }
 
@@ -301,6 +328,8 @@ class _ActivitySessionImpl extends ActivitySession {
     required DateTime reportReadyAt,
     DateTime? notificationSentAt,
     bool? isSeeded,
+    _is.UuidValue? replayId,
+    _ip2bu2mq.Replay? replay,
   }) : super._(
          id: id,
          profileId: profileId,
@@ -323,6 +352,8 @@ class _ActivitySessionImpl extends ActivitySession {
          reportReadyAt: reportReadyAt,
          notificationSentAt: notificationSentAt,
          isSeeded: isSeeded,
+         replayId: replayId,
+         replay: replay,
        );
 
   /// Returns a shallow copy of this [ActivitySession]
@@ -351,6 +382,8 @@ class _ActivitySessionImpl extends ActivitySession {
     DateTime? reportReadyAt,
     Object? notificationSentAt = _Undefined,
     bool? isSeeded,
+    Object? replayId = _Undefined,
+    Object? replay = _Undefined,
   }) {
     return ActivitySession(
       id: id is int? ? id : this.id,
@@ -378,6 +411,8 @@ class _ActivitySessionImpl extends ActivitySession {
           ? notificationSentAt
           : this.notificationSentAt,
       isSeeded: isSeeded ?? this.isSeeded,
+      replayId: replayId is _is.UuidValue? ? replayId : this.replayId,
+      replay: replay is _ip2bu2mq.Replay? ? replay : this.replay?.copyWith(),
     );
   }
 }
@@ -491,6 +526,20 @@ class ActivitySessionUpdateTable extends _is.UpdateTable<ActivitySessionTable> {
     table.isSeeded,
     value,
   );
+
+  _is.ColumnValue<_is.UuidValue, _is.UuidValue> replayId(
+    _is.UuidValue? value,
+  ) => _is.ColumnValue(
+    table.replayId,
+    value,
+  );
+
+  _is.ColumnValue<_ip2bu2mq.Replay, _ip2bu2mq.Replay> replay(
+    _ip2bu2mq.Replay? value,
+  ) => _is.ColumnValue(
+    table.replay,
+    value,
+  );
 }
 
 class ActivitySessionTable extends _is.Table<int?> {
@@ -579,6 +628,14 @@ class ActivitySessionTable extends _is.Table<int?> {
       this,
       hasDefault: true,
     );
+    replayId = _is.ColumnUuid(
+      'replayId',
+      this,
+    );
+    replay = _is.ColumnSerializable<_ip2bu2mq.Replay>(
+      'replay',
+      this,
+    );
   }
 
   late final ActivitySessionUpdateTable updateTable;
@@ -631,6 +688,13 @@ class ActivitySessionTable extends _is.Table<int?> {
   /// Demo-only history (slice 5).
   late final _is.ColumnBool isSeeded;
 
+  /// The walk's replay (Hackathon Round), built from the synced walk slices
+  /// when the report is due. `replayId` is the unguessable id in the public
+  /// link `/replay/<replayId>`.
+  late final _is.ColumnUuid replayId;
+
+  late final _is.ColumnSerializable<_ip2bu2mq.Replay> replay;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -654,6 +718,8 @@ class ActivitySessionTable extends _is.Table<int?> {
     reportReadyAt,
     notificationSentAt,
     isSeeded,
+    replayId,
+    replay,
   ];
 }
 

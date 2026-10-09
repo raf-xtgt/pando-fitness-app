@@ -11,11 +11,16 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod_database/serverpod_database.dart' as _isd;
 import 'package:serverpod_serialization/serverpod_serialization.dart' as _iss;
 import 'gait.dart' as _inj31qqz;
+import 'replay.dart' as _i0dnxot1;
+import 'replay_segment.dart' as _i3qcf5wl;
 import 'walk_slice.dart' as _ichtdng7;
 export 'gait.dart';
+export 'replay.dart';
+export 'replay_segment.dart';
 export 'walk_slice.dart';
 
 class Protocol extends _isd.DatabaseSerializationManager {
@@ -141,14 +146,33 @@ class Protocol extends _isd.DatabaseSerializationManager {
     if (t == _inj31qqz.Gait) {
       return _inj31qqz.Gait.fromJson(data) as T;
     }
+    if (t == _i0dnxot1.Replay) {
+      return _i0dnxot1.Replay.fromJson(data) as T;
+    }
+    if (t == _i3qcf5wl.ReplaySegment) {
+      return _i3qcf5wl.ReplaySegment.fromJson(data) as T;
+    }
     if (t == _ichtdng7.WalkSlice) {
       return _ichtdng7.WalkSlice.fromJson(data) as T;
     }
     if (t == _iss.getType<_inj31qqz.Gait?>()) {
       return (data != null ? _inj31qqz.Gait.fromJson(data) : null) as T;
     }
+    if (t == _iss.getType<_i0dnxot1.Replay?>()) {
+      return (data != null ? _i0dnxot1.Replay.fromJson(data) : null) as T;
+    }
+    if (t == _iss.getType<_i3qcf5wl.ReplaySegment?>()) {
+      return (data != null ? _i3qcf5wl.ReplaySegment.fromJson(data) : null)
+          as T;
+    }
     if (t == _iss.getType<_ichtdng7.WalkSlice?>()) {
       return (data != null ? _ichtdng7.WalkSlice.fromJson(data) : null) as T;
+    }
+    if (t == List<_ip2bu2mq.ReplaySegment>) {
+      return (data as List)
+              .map((e) => deserialize<_ip2bu2mq.ReplaySegment>(e))
+              .toList()
+          as T;
     }
     return super.deserialize<T>(data, t);
   }
@@ -156,6 +180,8 @@ class Protocol extends _isd.DatabaseSerializationManager {
   static String? getClassNameForType(Type type) {
     return switch (type) {
       _inj31qqz.Gait => 'Gait',
+      _i0dnxot1.Replay => 'Replay',
+      _i3qcf5wl.ReplaySegment => 'ReplaySegment',
       _ichtdng7.WalkSlice => 'WalkSlice',
       _ => null,
     };
@@ -173,6 +199,10 @@ class Protocol extends _isd.DatabaseSerializationManager {
     switch (data) {
       case _inj31qqz.Gait():
         return 'Gait';
+      case _i0dnxot1.Replay():
+        return 'Replay';
+      case _i3qcf5wl.ReplaySegment():
+        return 'ReplaySegment';
       case _ichtdng7.WalkSlice():
         return 'WalkSlice';
     }
@@ -187,6 +217,12 @@ class Protocol extends _isd.DatabaseSerializationManager {
     }
     if (dataClassName == 'Gait') {
       return deserialize<_inj31qqz.Gait>(data['data']);
+    }
+    if (dataClassName == 'Replay') {
+      return deserialize<_i0dnxot1.Replay>(data['data']);
+    }
+    if (dataClassName == 'ReplaySegment') {
+      return deserialize<_i3qcf5wl.ReplaySegment>(data['data']);
     }
     if (dataClassName == 'WalkSlice') {
       return deserialize<_ichtdng7.WalkSlice>(data['data']);

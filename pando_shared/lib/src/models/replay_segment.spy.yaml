@@ -1,0 +1,9 @@
+### One stretch of a replay with one gait: from `fromM` to `toM` along the
+### journey path, `realS` seconds of the real walk, shown in `playS` seconds.
+class: ReplaySegment
+fields:
+  fromM: double
+  toM: double
+  gait: Gait
+  realS: double
+  playS: double

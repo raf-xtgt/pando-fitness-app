@@ -35,7 +35,7 @@ void main() {
     );
   });
 
-  test('140 steps per minute or more is running', () {
+  test('130 steps per minute or more is running', () {
     final timeline = steady(160, 20);
     expect(
       detector.classify(timeline, start.add(const Duration(seconds: 20))),
