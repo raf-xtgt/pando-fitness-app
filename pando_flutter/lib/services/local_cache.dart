@@ -11,6 +11,7 @@ class LocalCache {
   static const _heightKey = 'profile.heightM';
   static const _planKey = 'session.plan';
   static const _sessionsKey = 'session.list';
+  static const _screeningKey = 'profile.screening';
 
   final SharedPreferences _prefs;
 
@@ -18,6 +19,15 @@ class LocalCache {
 
   Future<void> setHeightMetres(double metres) =>
       _prefs.setDouble(_heightKey, metres);
+
+  /// The safety check's answer, once given (asked only once).
+  ScreeningResult? get screening {
+    final raw = _prefs.getString(_screeningKey);
+    return raw == null ? null : ScreeningResult.fromJson(raw);
+  }
+
+  Future<void> setScreening(ScreeningResult result) =>
+      _prefs.setString(_screeningKey, result.toJson());
 
   /// The plan for the next activity (goal, stride, resume point, signs).
   ActivityPlan? get plan {

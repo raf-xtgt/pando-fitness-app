@@ -29,6 +29,41 @@ class ProfileEndpoint extends Endpoint {
     );
   }
 
+  /// Saves the caller's safety check: their result from the official PAR-Q+
+  /// and its edition ([version]). A retake overwrites it. Creates the
+  /// profile if needed (the check can arrive before the height).
+  Future<UserProfile> saveScreening(
+    Session session,
+    ScreeningResult result,
+    String version,
+  ) async {
+    final edition = version.trim();
+    if (edition.isEmpty || edition.length > 100) {
+      throw ArgumentError.value(version, 'version', 'must be 1–100 chars');
+    }
+    final now = DateTime.now().toUtc();
+    final existing = await session.callerProfile();
+    if (existing == null) {
+      return UserProfile.db.insertRow(
+        session,
+        UserProfile(
+          authUserId: session.callerAuthUserId,
+          screeningResult: result,
+          screeningAt: now,
+          screeningVersion: edition,
+        ),
+      );
+    }
+    return UserProfile.db.updateRow(
+      session,
+      existing.copyWith(
+        screeningResult: result,
+        screeningAt: now,
+        screeningVersion: edition,
+      ),
+    );
+  }
+
   /// Stores the phone's push token so the delayed report can reach it.
   Future<void> registerPushToken(Session session, String token) async {
     final existing = await session.callerProfile();

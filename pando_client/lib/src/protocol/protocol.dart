@@ -24,6 +24,7 @@ import 'package:serverpod_offline_sync_client/serverpod_offline_sync_client.dart
 import 'activity_plan.dart' as _ic0xtzcg;
 import 'activity_session.dart' as _ij0gynqy;
 import 'feel.dart' as _ifrvopus;
+import 'screening_result.dart' as _i2bmhkxi;
 import 'session_input.dart' as _ikrqxmzf;
 import 'session_report.dart' as _iqhwxw5q;
 import 'user_profile.dart' as _ir2mn8w1;
@@ -31,6 +32,7 @@ import 'walk_in_progress.dart' as _ie46f9by;
 export 'activity_plan.dart';
 export 'activity_session.dart';
 export 'feel.dart';
+export 'screening_result.dart';
 export 'session_input.dart';
 export 'session_report.dart';
 export 'user_profile.dart';
@@ -162,6 +164,9 @@ class Protocol extends _isd.DatabaseSerializationManager {
     if (t == _ifrvopus.Feel) {
       return _ifrvopus.Feel.fromJson(data) as T;
     }
+    if (t == _i2bmhkxi.ScreeningResult) {
+      return _i2bmhkxi.ScreeningResult.fromJson(data) as T;
+    }
     if (t == _ikrqxmzf.SessionInput) {
       return _ikrqxmzf.SessionInput.fromJson(data) as T;
     }
@@ -183,6 +188,10 @@ class Protocol extends _isd.DatabaseSerializationManager {
     }
     if (t == _isc.getType<_ifrvopus.Feel?>()) {
       return (data != null ? _ifrvopus.Feel.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i2bmhkxi.ScreeningResult?>()) {
+      return (data != null ? _i2bmhkxi.ScreeningResult.fromJson(data) : null)
+          as T;
     }
     if (t == _isc.getType<_ikrqxmzf.SessionInput?>()) {
       return (data != null ? _ikrqxmzf.SessionInput.fromJson(data) : null) as T;
@@ -227,6 +236,7 @@ class Protocol extends _isd.DatabaseSerializationManager {
       _ic0xtzcg.ActivityPlan => 'ActivityPlan',
       _ij0gynqy.ActivitySession => 'ActivitySession',
       _ifrvopus.Feel => 'Feel',
+      _i2bmhkxi.ScreeningResult => 'ScreeningResult',
       _ikrqxmzf.SessionInput => 'SessionInput',
       _iqhwxw5q.SessionReport => 'SessionReport',
       _ir2mn8w1.UserProfile => 'UserProfile',
@@ -251,6 +261,8 @@ class Protocol extends _isd.DatabaseSerializationManager {
         return 'ActivitySession';
       case _ifrvopus.Feel():
         return 'Feel';
+      case _i2bmhkxi.ScreeningResult():
+        return 'ScreeningResult';
       case _ikrqxmzf.SessionInput():
         return 'SessionInput';
       case _iqhwxw5q.SessionReport():
@@ -299,6 +311,9 @@ class Protocol extends _isd.DatabaseSerializationManager {
     }
     if (dataClassName == 'Feel') {
       return deserialize<_ifrvopus.Feel>(data['data']);
+    }
+    if (dataClassName == 'ScreeningResult') {
+      return deserialize<_i2bmhkxi.ScreeningResult>(data['data']);
     }
     if (dataClassName == 'SessionInput') {
       return deserialize<_ikrqxmzf.SessionInput>(data['data']);

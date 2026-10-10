@@ -1,3 +1,4 @@
+import 'package:pando_server/src/generated/protocol.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';
@@ -50,6 +51,54 @@ void main() {
     test('when an impossible height is sent then it is rejected', () async {
       await expectLater(
         endpoints.profile.saveHeight(alice, 9.0),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('when the safety check is saved then result, time and version are '
+        'stored', () async {
+      await endpoints.profile.saveHeight(alice, 1.70);
+      final before = DateTime.now().toUtc();
+      await endpoints.profile.saveScreening(
+        alice,
+        ScreeningResult.someApply,
+        'PAR-Q+ 2025',
+      );
+      final profile = await endpoints.profile.get(alice);
+      expect(profile?.screeningResult, ScreeningResult.someApply);
+      expect(profile?.screeningVersion, 'PAR-Q+ 2025');
+      expect(
+        profile!.screeningAt!.isBefore(
+          before.subtract(const Duration(seconds: 5)),
+        ),
+        isFalse,
+      );
+      expect(profile.heightM, 1.70);
+    });
+
+    test(
+      'when the check is retaken then the new answer overwrites it',
+      () async {
+        await endpoints.profile.saveScreening(
+          alice,
+          ScreeningResult.someApply,
+          'PAR-Q+ 2025',
+        );
+        await endpoints.profile.saveScreening(
+          alice,
+          ScreeningResult.noneApply,
+          'PAR-Q+ 2026',
+        );
+        final profile = await endpoints.profile.get(alice);
+        expect(profile?.screeningResult, ScreeningResult.noneApply);
+        expect(profile?.screeningVersion, 'PAR-Q+ 2026');
+        expect(await endpoints.profile.get(bob), isNull);
+      },
+    );
+
+    test('when the version is empty then saveScreening is refused', () async {
+      await expectLater(
+        endpoints.profile.saveScreening(alice, ScreeningResult.noneApply, ' '),
         throwsA(isA<ArgumentError>()),
       );
     });

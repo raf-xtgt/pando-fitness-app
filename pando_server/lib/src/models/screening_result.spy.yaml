@@ -1,0 +1,7 @@
+### The walker's own result from the official PAR-Q+ (eparmedx.com): none
+### of the 7 general health questions apply, or some do.
+enum: ScreeningResult
+serialized: byName
+values:
+  - noneApply
+  - someApply

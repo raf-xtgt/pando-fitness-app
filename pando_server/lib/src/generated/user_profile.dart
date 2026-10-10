@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
+import 'screening_result.dart' as _i2bmhkxi;
 
 /// One person's Pando profile, tied to their anonymous sign-in.
 abstract class UserProfile
@@ -21,6 +22,9 @@ abstract class UserProfile
     this.heightM,
     this.fcmToken,
     DateTime? createdAt,
+    this.screeningResult,
+    this.screeningAt,
+    this.screeningVersion,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory UserProfile({
@@ -29,6 +33,9 @@ abstract class UserProfile
     double? heightM,
     String? fcmToken,
     DateTime? createdAt,
+    _i2bmhkxi.ScreeningResult? screeningResult,
+    DateTime? screeningAt,
+    String? screeningVersion,
   }) = _UserProfileImpl;
 
   factory UserProfile.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -42,6 +49,17 @@ abstract class UserProfile
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _is.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      screeningResult: jsonSerialization['screeningResult'] == null
+          ? null
+          : _i2bmhkxi.ScreeningResult.fromJson(
+              (jsonSerialization['screeningResult'] as String),
+            ),
+      screeningAt: jsonSerialization['screeningAt'] == null
+          ? null
+          : _is.DateTimeJsonExtension.fromJson(
+              jsonSerialization['screeningAt'],
+            ),
+      screeningVersion: jsonSerialization['screeningVersion'] as String?,
     );
   }
 
@@ -63,6 +81,15 @@ abstract class UserProfile
 
   DateTime createdAt;
 
+  /// Safety check (Hackathon Round): the walker's PAR-Q+ result, when they
+  /// gave it, and which PAR-Q+ edition. Null until answered. Pando links to
+  /// the official form; it doesn't show the questions itself.
+  _i2bmhkxi.ScreeningResult? screeningResult;
+
+  DateTime? screeningAt;
+
+  String? screeningVersion;
+
   @override
   _is.Table<int?> get table => t;
 
@@ -75,6 +102,9 @@ abstract class UserProfile
     double? heightM,
     String? fcmToken,
     DateTime? createdAt,
+    _i2bmhkxi.ScreeningResult? screeningResult,
+    DateTime? screeningAt,
+    String? screeningVersion,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -85,6 +115,9 @@ abstract class UserProfile
       if (heightM != null) 'heightM': heightM,
       if (fcmToken != null) 'fcmToken': fcmToken,
       'createdAt': createdAt.toJson(),
+      if (screeningResult != null) 'screeningResult': screeningResult?.toJson(),
+      if (screeningAt != null) 'screeningAt': screeningAt?.toJson(),
+      if (screeningVersion != null) 'screeningVersion': screeningVersion,
     };
   }
 
@@ -97,6 +130,9 @@ abstract class UserProfile
       if (heightM != null) 'heightM': heightM,
       if (fcmToken != null) 'fcmToken': fcmToken,
       'createdAt': createdAt.toJson(),
+      if (screeningResult != null) 'screeningResult': screeningResult?.toJson(),
+      if (screeningAt != null) 'screeningAt': screeningAt?.toJson(),
+      if (screeningVersion != null) 'screeningVersion': screeningVersion,
     };
   }
 
@@ -137,12 +173,18 @@ class _UserProfileImpl extends UserProfile {
     double? heightM,
     String? fcmToken,
     DateTime? createdAt,
+    _i2bmhkxi.ScreeningResult? screeningResult,
+    DateTime? screeningAt,
+    String? screeningVersion,
   }) : super._(
          id: id,
          authUserId: authUserId,
          heightM: heightM,
          fcmToken: fcmToken,
          createdAt: createdAt,
+         screeningResult: screeningResult,
+         screeningAt: screeningAt,
+         screeningVersion: screeningVersion,
        );
 
   /// Returns a shallow copy of this [UserProfile]
@@ -155,6 +197,9 @@ class _UserProfileImpl extends UserProfile {
     Object? heightM = _Undefined,
     Object? fcmToken = _Undefined,
     DateTime? createdAt,
+    Object? screeningResult = _Undefined,
+    Object? screeningAt = _Undefined,
+    Object? screeningVersion = _Undefined,
   }) {
     return UserProfile(
       id: id is int? ? id : this.id,
@@ -162,6 +207,13 @@ class _UserProfileImpl extends UserProfile {
       heightM: heightM is double? ? heightM : this.heightM,
       fcmToken: fcmToken is String? ? fcmToken : this.fcmToken,
       createdAt: createdAt ?? this.createdAt,
+      screeningResult: screeningResult is _i2bmhkxi.ScreeningResult?
+          ? screeningResult
+          : this.screeningResult,
+      screeningAt: screeningAt is DateTime? ? screeningAt : this.screeningAt,
+      screeningVersion: screeningVersion is String?
+          ? screeningVersion
+          : this.screeningVersion,
     );
   }
 }
@@ -191,6 +243,24 @@ class UserProfileUpdateTable extends _is.UpdateTable<UserProfileTable> {
         table.createdAt,
         value,
       );
+
+  _is.ColumnValue<_i2bmhkxi.ScreeningResult, _i2bmhkxi.ScreeningResult>
+  screeningResult(_i2bmhkxi.ScreeningResult? value) => _is.ColumnValue(
+    table.screeningResult,
+    value,
+  );
+
+  _is.ColumnValue<DateTime, DateTime> screeningAt(DateTime? value) =>
+      _is.ColumnValue(
+        table.screeningAt,
+        value,
+      );
+
+  _is.ColumnValue<String, String> screeningVersion(String? value) =>
+      _is.ColumnValue(
+        table.screeningVersion,
+        value,
+      );
 }
 
 class UserProfileTable extends _is.Table<int?> {
@@ -213,6 +283,19 @@ class UserProfileTable extends _is.Table<int?> {
       this,
       hasDefault: true,
     );
+    screeningResult = _is.ColumnEnum(
+      'screeningResult',
+      this,
+      _is.EnumSerialization.byName,
+    );
+    screeningAt = _is.ColumnDateTime(
+      'screeningAt',
+      this,
+    );
+    screeningVersion = _is.ColumnString(
+      'screeningVersion',
+      this,
+    );
   }
 
   late final UserProfileUpdateTable updateTable;
@@ -228,6 +311,15 @@ class UserProfileTable extends _is.Table<int?> {
 
   late final _is.ColumnDateTime createdAt;
 
+  /// Safety check (Hackathon Round): the walker's PAR-Q+ result, when they
+  /// gave it, and which PAR-Q+ edition. Null until answered. Pando links to
+  /// the official form; it doesn't show the questions itself.
+  late final _is.ColumnEnum<_i2bmhkxi.ScreeningResult> screeningResult;
+
+  late final _is.ColumnDateTime screeningAt;
+
+  late final _is.ColumnString screeningVersion;
+
   @override
   List<_is.Column> get columns => [
     id,
@@ -235,6 +327,9 @@ class UserProfileTable extends _is.Table<int?> {
     heightM,
     fcmToken,
     createdAt,
+    screeningResult,
+    screeningAt,
+    screeningVersion,
   ];
 }
 

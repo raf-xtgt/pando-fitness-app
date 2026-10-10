@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'screening_result.dart' as _i2bmhkxi;
 
 /// One person's Pando profile, tied to their anonymous sign-in.
 abstract class UserProfile
@@ -21,6 +22,9 @@ abstract class UserProfile
     this.heightM,
     this.fcmToken,
     DateTime? createdAt,
+    this.screeningResult,
+    this.screeningAt,
+    this.screeningVersion,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory UserProfile({
@@ -29,6 +33,9 @@ abstract class UserProfile
     double? heightM,
     String? fcmToken,
     DateTime? createdAt,
+    _i2bmhkxi.ScreeningResult? screeningResult,
+    DateTime? screeningAt,
+    String? screeningVersion,
   }) = _UserProfileImpl;
 
   factory UserProfile.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -42,6 +49,17 @@ abstract class UserProfile
       createdAt: jsonSerialization['createdAt'] == null
           ? null
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['createdAt']),
+      screeningResult: jsonSerialization['screeningResult'] == null
+          ? null
+          : _i2bmhkxi.ScreeningResult.fromJson(
+              (jsonSerialization['screeningResult'] as String),
+            ),
+      screeningAt: jsonSerialization['screeningAt'] == null
+          ? null
+          : _isc.DateTimeJsonExtension.fromJson(
+              jsonSerialization['screeningAt'],
+            ),
+      screeningVersion: jsonSerialization['screeningVersion'] as String?,
     );
   }
 
@@ -61,6 +79,15 @@ abstract class UserProfile
 
   DateTime createdAt;
 
+  /// Safety check (Hackathon Round): the walker's PAR-Q+ result, when they
+  /// gave it, and which PAR-Q+ edition. Null until answered. Pando links to
+  /// the official form; it doesn't show the questions itself.
+  _i2bmhkxi.ScreeningResult? screeningResult;
+
+  DateTime? screeningAt;
+
+  String? screeningVersion;
+
   /// Returns a shallow copy of this [UserProfile]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
@@ -70,6 +97,9 @@ abstract class UserProfile
     double? heightM,
     String? fcmToken,
     DateTime? createdAt,
+    _i2bmhkxi.ScreeningResult? screeningResult,
+    DateTime? screeningAt,
+    String? screeningVersion,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -80,6 +110,9 @@ abstract class UserProfile
       if (heightM != null) 'heightM': heightM,
       if (fcmToken != null) 'fcmToken': fcmToken,
       'createdAt': createdAt.toJson(),
+      if (screeningResult != null) 'screeningResult': screeningResult?.toJson(),
+      if (screeningAt != null) 'screeningAt': screeningAt?.toJson(),
+      if (screeningVersion != null) 'screeningVersion': screeningVersion,
     };
   }
 
@@ -92,6 +125,9 @@ abstract class UserProfile
       if (heightM != null) 'heightM': heightM,
       if (fcmToken != null) 'fcmToken': fcmToken,
       'createdAt': createdAt.toJson(),
+      if (screeningResult != null) 'screeningResult': screeningResult?.toJson(),
+      if (screeningAt != null) 'screeningAt': screeningAt?.toJson(),
+      if (screeningVersion != null) 'screeningVersion': screeningVersion,
     };
   }
 
@@ -110,12 +146,18 @@ class _UserProfileImpl extends UserProfile {
     double? heightM,
     String? fcmToken,
     DateTime? createdAt,
+    _i2bmhkxi.ScreeningResult? screeningResult,
+    DateTime? screeningAt,
+    String? screeningVersion,
   }) : super._(
          id: id,
          authUserId: authUserId,
          heightM: heightM,
          fcmToken: fcmToken,
          createdAt: createdAt,
+         screeningResult: screeningResult,
+         screeningAt: screeningAt,
+         screeningVersion: screeningVersion,
        );
 
   /// Returns a shallow copy of this [UserProfile]
@@ -128,6 +170,9 @@ class _UserProfileImpl extends UserProfile {
     Object? heightM = _Undefined,
     Object? fcmToken = _Undefined,
     DateTime? createdAt,
+    Object? screeningResult = _Undefined,
+    Object? screeningAt = _Undefined,
+    Object? screeningVersion = _Undefined,
   }) {
     return UserProfile(
       id: id is int? ? id : this.id,
@@ -135,6 +180,13 @@ class _UserProfileImpl extends UserProfile {
       heightM: heightM is double? ? heightM : this.heightM,
       fcmToken: fcmToken is String? ? fcmToken : this.fcmToken,
       createdAt: createdAt ?? this.createdAt,
+      screeningResult: screeningResult is _i2bmhkxi.ScreeningResult?
+          ? screeningResult
+          : this.screeningResult,
+      screeningAt: screeningAt is DateTime? ? screeningAt : this.screeningAt,
+      screeningVersion: screeningVersion is String?
+          ? screeningVersion
+          : this.screeningVersion,
     );
   }
 }

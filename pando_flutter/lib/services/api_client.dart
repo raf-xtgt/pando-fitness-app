@@ -77,6 +77,14 @@ class ApiClient {
     return _client.profile.saveHeight(heightM);
   }
 
+  Future<UserProfile> saveScreening(
+    ScreeningResult result,
+    String version,
+  ) async {
+    await ensureSignedIn();
+    return _client.profile.saveScreening(result, version);
+  }
+
   Future<ActivityPlan> plan() async {
     await ensureSignedIn();
     return _client.session.plan();

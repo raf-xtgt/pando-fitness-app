@@ -3,11 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../app/onboarding.dart';
 import '../../game/asset_manifest.dart';
 import '../../services/app_services.dart';
-import '../home/home_screen.dart';
 import '../mascot/floating_mascot.dart';
-import '../onboarding/height_screen.dart';
 
 /// Wordmark, floating mascot and welcome while startup runs: sign in, send
 /// anything queued, fetch the profile. Then Home, or Height on first
@@ -37,16 +36,17 @@ class _SplashScreenState extends State<SplashScreen> {
       final profile = await services.api.getProfile();
       final height = profile?.heightM;
       if (height != null) await services.cache.setHeightMetres(height);
+      final screening = profile?.screeningResult;
+      if (screening != null) await services.cache.setScreening(screening);
     } catch (e) {
       debugPrint('Pando startup: server not reached, using cache ($e)');
     }
     await shown;
     if (!mounted) return;
 
-    final hasHeight = services.cache.heightMetres != null;
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
-        builder: (_) => hasHeight ? const HomeScreen() : const HeightScreen(),
+        builder: (_) => nextOnboardingScreen(services.cache),
       ),
     );
   }

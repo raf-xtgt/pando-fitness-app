@@ -18,6 +18,7 @@ import 'package:pando_server/src/generated/activity_session.dart' as _inhq2gcy;
 import 'package:pando_server/src/generated/future_calls.dart' as _i8kxefyk;
 import 'package:pando_server/src/generated/future_calls_generated_models/send_report_notification_future_call_send_model.dart'
     as _ibqygl5s;
+import 'package:pando_server/src/generated/screening_result.dart' as _ixx01vju;
 import 'package:pando_server/src/generated/session_input.dart' as _ioouzq3l;
 import 'package:pando_server/src/generated/session_report.dart' as _iyejdiwy;
 import 'package:pando_server/src/generated/user_profile.dart' as _ism2ds39;
@@ -393,6 +394,41 @@ class _ProfileEndpoint {
           endpointPath: 'profile',
           methodName: 'saveHeight',
           parameters: _ist.testObjectToJson({'heightM': heightM}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ism2ds39.UserProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_ism2ds39.UserProfile> saveScreening(
+    _ist.TestSessionBuilder sessionBuilder,
+    _ixx01vju.ScreeningResult result,
+    String version,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'profile',
+            method: 'saveScreening',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'profile',
+          methodName: 'saveScreening',
+          parameters: _ist.testObjectToJson({
+            'result': result,
+            'version': version,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

@@ -14,6 +14,7 @@ import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:pando_client/src/protocol/activity_plan.dart' as _i4ejyc17;
 import 'package:pando_client/src/protocol/activity_session.dart' as _itsbeekw;
+import 'package:pando_client/src/protocol/screening_result.dart' as _is5jgpax;
 import 'package:pando_client/src/protocol/session_input.dart' as _i6unmrz6;
 import 'package:pando_client/src/protocol/session_report.dart' as _i8rxrde7;
 import 'package:pando_client/src/protocol/user_profile.dart' as _i7vdt7l1;
@@ -136,6 +137,21 @@ class EndpointProfile extends _isc.EndpointRef {
         'saveHeight',
         {'heightM': heightM},
       );
+
+  /// Saves the caller's safety check: their result from the official PAR-Q+
+  /// and its edition ([version]). A retake overwrites it. Creates the
+  /// profile if needed (the check can arrive before the height).
+  _ida.Future<_i7vdt7l1.UserProfile> saveScreening(
+    _is5jgpax.ScreeningResult result,
+    String version,
+  ) => caller.callServerEndpoint<_i7vdt7l1.UserProfile>(
+    'profile',
+    'saveScreening',
+    {
+      'result': result,
+      'version': version,
+    },
+  );
 
   /// Stores the phone's push token so the delayed report can reach it.
   _ida.Future<void> registerPushToken(String token) =>

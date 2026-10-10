@@ -9,6 +9,12 @@ fields:
   ### Firebase Cloud Messaging token for the delayed report (slice 4).
   fcmToken: String?
   createdAt: DateTime, default=now
+  ### Safety check (Hackathon Round): the walker's PAR-Q+ result, when they
+  ### gave it, and which PAR-Q+ edition. Null until answered. Pando links to
+  ### the official form; it doesn't show the questions itself.
+  screeningResult: ScreeningResult?
+  screeningAt: DateTime?
+  screeningVersion: String?
 indexes:
   user_profile_auth_user_idx:
     fields: authUserId

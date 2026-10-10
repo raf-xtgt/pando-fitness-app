@@ -26,6 +26,7 @@ import 'activity_session.dart' as _ij0gynqy;
 import 'feel.dart' as _ifrvopus;
 import 'future_calls_generated_models/send_report_notification_future_call_send_model.dart'
     as _iz8uraq0;
+import 'screening_result.dart' as _i2bmhkxi;
 import 'session_input.dart' as _ikrqxmzf;
 import 'session_report.dart' as _iqhwxw5q;
 import 'user_profile.dart' as _ir2mn8w1;
@@ -33,6 +34,7 @@ import 'walk_in_progress.dart' as _ie46f9by;
 export 'activity_plan.dart';
 export 'activity_session.dart';
 export 'feel.dart';
+export 'screening_result.dart';
 export 'session_input.dart';
 export 'session_report.dart';
 export 'user_profile.dart';
@@ -291,6 +293,24 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'DateTime',
           columnDefault: 'now',
         ),
+        _isp.ColumnDefinition(
+          name: 'screeningResult',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'protocol:ScreeningResult?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'screeningAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'screeningVersion',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
       ],
       foreignKeys: [],
       indexes: [
@@ -360,6 +380,9 @@ class Protocol extends _is.DatabaseSerializationManager {
       return _iz8uraq0.SendReportNotificationFutureCallSendModel.fromJson(data)
           as T;
     }
+    if (t == _i2bmhkxi.ScreeningResult) {
+      return _i2bmhkxi.ScreeningResult.fromJson(data) as T;
+    }
     if (t == _ikrqxmzf.SessionInput) {
       return _ikrqxmzf.SessionInput.fromJson(data) as T;
     }
@@ -389,6 +412,10 @@ class Protocol extends _is.DatabaseSerializationManager {
                   data,
                 )
               : null)
+          as T;
+    }
+    if (t == _is.getType<_i2bmhkxi.ScreeningResult?>()) {
+      return (data != null ? _i2bmhkxi.ScreeningResult.fromJson(data) : null)
           as T;
     }
     if (t == _is.getType<_ikrqxmzf.SessionInput?>()) {
@@ -439,6 +466,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ifrvopus.Feel => 'Feel',
       _iz8uraq0.SendReportNotificationFutureCallSendModel =>
         'SendReportNotificationFutureCallSendModel',
+      _i2bmhkxi.ScreeningResult => 'ScreeningResult',
       _ikrqxmzf.SessionInput => 'SessionInput',
       _iqhwxw5q.SessionReport => 'SessionReport',
       _ir2mn8w1.UserProfile => 'UserProfile',
@@ -465,6 +493,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Feel';
       case _iz8uraq0.SendReportNotificationFutureCallSendModel():
         return 'SendReportNotificationFutureCallSendModel';
+      case _i2bmhkxi.ScreeningResult():
+        return 'ScreeningResult';
       case _ikrqxmzf.SessionInput():
         return 'SessionInput';
       case _iqhwxw5q.SessionReport():
@@ -522,6 +552,9 @@ class Protocol extends _is.DatabaseSerializationManager {
       return deserialize<_iz8uraq0.SendReportNotificationFutureCallSendModel>(
         data['data'],
       );
+    }
+    if (dataClassName == 'ScreeningResult') {
+      return deserialize<_i2bmhkxi.ScreeningResult>(data['data']);
     }
     if (dataClassName == 'SessionInput') {
       return deserialize<_ikrqxmzf.SessionInput>(data['data']);

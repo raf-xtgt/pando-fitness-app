@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:pando_server/src/generated/future_calls.dart' as _i8kxefyk;
+import 'package:pando_server/src/generated/screening_result.dart' as _ixx01vju;
 import 'package:pando_server/src/generated/session_input.dart' as _ioouzq3l;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -167,6 +168,31 @@ class Endpoints extends _is.EndpointDispatch {
                   .saveHeight(
                     session,
                     params['heightM'],
+                  ),
+        ),
+        'saveScreening': _is.MethodConnector(
+          name: 'saveScreening',
+          params: {
+            'result': _is.ParameterDescription(
+              name: 'result',
+              type: _is.getType<_ixx01vju.ScreeningResult>(),
+              nullable: false,
+            ),
+            'version': _is.ParameterDescription(
+              name: 'version',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['profile'] as _i2cx2pww.ProfileEndpoint)
+                  .saveScreening(
+                    session,
+                    params['result'],
+                    params['version'],
                   ),
         ),
         'registerPushToken': _is.MethodConnector(
