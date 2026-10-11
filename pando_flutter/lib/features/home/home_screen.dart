@@ -3,30 +3,43 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 
+import '../../app/main_shell.dart';
 import '../../app/config.dart';
 import '../../app/theme.dart';
 import '../../services/app_services.dart';
 import '../../services/step_counter_service.dart';
 import '../activity/activity_screen.dart';
 import '../report/report_screen.dart';
+import '../timeline/journey_totals.dart';
 import 'session_row.dart';
 
-/// A big + to start walking, and the walks so far (newest first).
+/// Your totals (steps, km, hours) and the walks so far (newest first).
+/// A walk starts from the mascot in the bottom bar (`MainShell`), which
+/// calls [HomeScreenState.start].
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   /// Rows switch from "report on its way" without a reload.
   static const Duration rowTick = Duration(seconds: 20);
 
+  /// True while a walk is left in progress, so the mascot's bubble can say
+  /// "finish" instead of "start".
+  static final ValueNotifier<bool> walkInProgress = ValueNotifier(false);
+
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
   final _services = AppServices.instance;
   String? _message;
   List<SessionRowData> _rows = [];
   Timer? _ticker;
+
+  /// Totals over every walk from the server (`session.timeline`); null until
+  /// loaded, then the walks on the phone stand in when the server can't be
+  /// reached.
+  TimelinePage? _totals;
 
   /// A walk Pando was killed in the middle of (from the on-phone database).
   WalkInProgress? _inProgress;
@@ -74,6 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
       unawaited(_services.push.registerToken());
       final sessions = await _services.api.listSessions();
       await _services.cache.setSessions(sessions);
+      final totals = await _services.api.timeline(0);
+      if (mounted) setState(() => _totals = totals);
       if (_services.queue.pendingSessions.isEmpty) {
         // Only trust the server's plan once it has every session.
         await _services.cache.setPlan(await _services.api.plan());
@@ -86,7 +101,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadInProgress() async {
     final walk = await _services.recorder.inProgress();
+    HomeScreen.walkInProgress.value = walk != null;
     if (mounted) setState(() => _inProgress = walk);
+  }
+
+  /// The mascot was tapped: finish the walk left in progress, else start
+  /// a new one.
+  Future<void> start() async {
+    if (_inProgress case final walk?) return _finishWalk(walk);
+    return _start();
   }
 
   Future<void> _start() async {
@@ -189,16 +212,35 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// The server's totals; until they load (or with no signal), the walks
+  /// on the phone.
+  JourneyTotals _journeyTotals() {
+    if (_totals case final t?) return JourneyTotals.of(t);
+    return JourneyTotals(
+      steps: _rows.fold(0, (sum, r) => sum + r.steps),
+      metres: _rows.fold(0.0, (sum, r) => sum + r.distanceM),
+      seconds: _rows.fold(0.0, (sum, r) => sum + r.durationS),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     return Scaffold(
       body: SafeArea(
+        // The list runs under the floating bar (`MainShell`).
+        bottom: false,
         child: RefreshIndicator(
           color: PandoColors.ink,
           onRefresh: _refresh,
           child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            // Room at the bottom for the floating bar and the bubble.
+            padding: const EdgeInsets.fromLTRB(
+              24,
+              16,
+              24,
+              MainShell.contentBottomInset,
+            ),
             children: [
               Text(
                 'Pando',
@@ -206,32 +248,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 32),
-              if (_inProgress case final walk?)
-                _WalkInProgressCard(onFinish: () => _finishWalk(walk))
-              else
-                Center(
-                  child: Semantics(
-                    button: true,
-                    label: 'Start an activity',
-                    child: GestureDetector(
-                      onTap: _start,
-                      child: const WobblyBox(
-                        seed: 3,
-                        strokeWidth: 3,
-                        padding: EdgeInsets.fromLTRB(44, 8, 44, 18),
-                        child: Text(
-                          '+',
-                          style: TextStyle(
-                            fontSize: 88,
-                            height: 1,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              const SizedBox(height: 24),
+              _journeyTotals(),
+              if (_inProgress case final walk?) ...[
+                const SizedBox(height: 24),
+                _WalkInProgressCard(onFinish: () => _finishWalk(walk)),
+              ],
               if (_message != null) ...[
                 const SizedBox(height: 20),
                 Text(

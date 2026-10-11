@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 
+import '../../app/main_shell.dart';
 import '../../app/theme.dart';
 import '../../domain/units.dart';
 import '../../game/asset_manifest.dart';
@@ -10,6 +11,7 @@ import '../../services/app_services.dart';
 import '../home/session_row.dart';
 import '../mascot/floating_mascot.dart';
 import '../report/report_screen.dart';
+import 'journey_totals.dart';
 import 'trail_layout.dart';
 
 /// The journey timeline: totals over every walk (steps, km, hours), then the
@@ -107,11 +109,19 @@ class _TimelineScreenState extends State<TimelineScreen> {
     final totals = _totals;
     return Scaffold(
       body: SafeArea(
+        // The list runs under the floating bar (`MainShell`).
+        bottom: false,
         child: RefreshIndicator(
           color: PandoColors.ink,
           onRefresh: _reload,
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            // Room at the bottom for the floating bar.
+            padding: const EdgeInsets.fromLTRB(
+              20,
+              16,
+              20,
+              MainShell.contentBottomInset,
+            ),
             children: [
               Text(
                 'Your journey',
@@ -138,7 +148,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   ),
                 )
               else ...[
-                _Totals(page: totals),
+                JourneyTotals.of(totals),
                 const SizedBox(height: 12),
                 const _Legend(),
                 if (_checkpoints.isEmpty)
@@ -226,84 +236,6 @@ class _Legend extends StatelessWidget {
         const SizedBox(width: 24),
         item(PandoColors.fire, 'ran'),
       ],
-    );
-  }
-}
-
-/// Steps, km and hours over every walk, in three paper tiles.
-class _Totals extends StatelessWidget {
-  const _Totals({required this.page});
-
-  final TimelinePage page;
-
-  @override
-  Widget build(BuildContext context) {
-    final km = page.totalM / 1000;
-    final hours = page.totalS / 3600;
-    return Row(
-      children: [
-        Expanded(
-          child: _Tile(
-            seed: 51,
-            value: formatCount(page.totalSteps),
-            unit: 'steps',
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _Tile(
-            seed: 52,
-            value: km.toStringAsFixed(km < 10 ? 2 : 1),
-            unit: 'km',
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _Tile(
-            seed: 53,
-            value: hours.toStringAsFixed(1),
-            unit: hours == 1 ? 'hour' : 'hours',
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Tile extends StatelessWidget {
-  const _Tile({required this.seed, required this.value, required this.unit});
-
-  final int seed;
-  final String value;
-  final String unit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: '$value $unit',
-      child: ExcludeSemantics(
-        child: WobblyBox(
-          seed: seed,
-          strokeWidth: 2.4,
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
-          child: Column(
-            children: [
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 26,
-                    height: 1.1,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Text(unit, style: const TextStyle(fontSize: 15)),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

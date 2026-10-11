@@ -12,6 +12,8 @@ class SessionRowData {
     required this.sessionId,
     required this.endedAt,
     required this.distanceM,
+    required this.steps,
+    required this.durationS,
     required this.goalMet,
     required this.feel,
     required this.reportReadyAt,
@@ -22,6 +24,8 @@ class SessionRowData {
     sessionId: s.id,
     endedAt: s.endedAt,
     distanceM: s.distanceM,
+    steps: s.steps,
+    durationS: _seconds(s.startedAt, s.endedAt),
     goalMet: s.goalMet,
     feel: s.feel,
     reportReadyAt: s.reportReadyAt,
@@ -35,6 +39,8 @@ class SessionRowData {
         sessionId: null,
         endedAt: input.endedAt,
         distanceM: input.steps * strideM,
+        steps: input.steps,
+        durationS: _seconds(input.startedAt, input.endedAt),
         goalMet: input.steps >= input.goalSteps,
         feel: input.feel,
         reportReadyAt: input.endedAt.add(const Duration(minutes: 5)),
@@ -46,9 +52,16 @@ class SessionRowData {
   final int? sessionId;
   final DateTime endedAt;
   final double distanceM;
+  final int steps;
+
+  /// Start to stop, in seconds (for Home's totals).
+  final double durationS;
   final bool goalMet;
   final Feel? feel;
   final DateTime reportReadyAt;
+
+  static double _seconds(DateTime start, DateTime end) =>
+      end.difference(start).inMilliseconds.clamp(0, 1 << 62) / 1000;
 
   bool get reportPending => DateTime.now().isBefore(reportReadyAt);
 
