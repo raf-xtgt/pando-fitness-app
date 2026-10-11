@@ -40,13 +40,14 @@ abstract final class AssetManifest {
   static const String pathLayer = 'path';
   static const String pathObject = 'path';
 
-  // Runner: 192x192 frames. Row 0 faces down-right, row 1 faces up-right;
+  // Runner: 192x192 frames, one full stride loop per row (built by
+  // runner/build_runner.py). Row 0 faces down-right, row 1 faces up-right;
   // the left-hand facings are mirrored in code.
   static const SheetSpec runnerIdle = SheetSpec(
     file: 'runner/runner_idle.png',
     frameWidth: 192,
     frameHeight: 192,
-    frames: 6,
+    frames: 12,
     fps: 6,
     rows: 2,
   );
@@ -54,7 +55,7 @@ abstract final class AssetManifest {
     file: 'runner/runner_walk.png',
     frameWidth: 192,
     frameHeight: 192,
-    frames: 8,
+    frames: 11,
     fps: 10,
     rows: 2,
   );
@@ -63,7 +64,7 @@ abstract final class AssetManifest {
     frameWidth: 192,
     frameHeight: 192,
     frames: 8,
-    fps: 14,
+    fps: 12,
     rows: 2,
   );
 
