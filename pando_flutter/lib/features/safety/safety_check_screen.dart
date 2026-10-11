@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../app/main_shell.dart';
 import '../../app/theme.dart';
 import '../../services/app_services.dart';
 import '../../services/pending_queue.dart';
-import '../home/home_screen.dart';
 import '../mascot/floating_mascot.dart';
 
 /// A calm health check before the first walk. Pando doesn't show the PAR-Q+
@@ -60,7 +60,7 @@ class _SafetyCheckScreenState extends State<SafetyCheckScreen> {
   }
 
   void _goHome() => Navigator.of(context).pushReplacement(
-    MaterialPageRoute<void>(builder: (_) => const HomeScreen()),
+    MaterialPageRoute<void>(builder: (_) => const MainShell()),
   );
 
   @override

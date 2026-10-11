@@ -1,0 +1,12 @@
+### The journey timeline: totals over every walk, and one page of
+### checkpoints (newest first).
+class: TimelinePage
+fields:
+  totalSteps: int
+  totalM: double
+  ### Sum of the walks' durations (start to stop).
+  totalS: double
+  walkCount: int
+  checkpoints: List<TimelineCheckpoint>
+  ### Older checkpoints exist (the next page).
+  hasEarlier: bool

@@ -27,6 +27,8 @@ import 'feel.dart' as _ifrvopus;
 import 'screening_result.dart' as _i2bmhkxi;
 import 'session_input.dart' as _ikrqxmzf;
 import 'session_report.dart' as _iqhwxw5q;
+import 'timeline_checkpoint.dart' as _ihf7wrsf;
+import 'timeline_page.dart' as _iflpzabq;
 import 'user_profile.dart' as _ir2mn8w1;
 import 'walk_in_progress.dart' as _ie46f9by;
 export 'activity_plan.dart';
@@ -35,6 +37,8 @@ export 'feel.dart';
 export 'screening_result.dart';
 export 'session_input.dart';
 export 'session_report.dart';
+export 'timeline_checkpoint.dart';
+export 'timeline_page.dart';
 export 'user_profile.dart';
 export 'walk_in_progress.dart';
 export 'client.dart';
@@ -173,6 +177,12 @@ class Protocol extends _isd.DatabaseSerializationManager {
     if (t == _iqhwxw5q.SessionReport) {
       return _iqhwxw5q.SessionReport.fromJson(data) as T;
     }
+    if (t == _ihf7wrsf.TimelineCheckpoint) {
+      return _ihf7wrsf.TimelineCheckpoint.fromJson(data) as T;
+    }
+    if (t == _iflpzabq.TimelinePage) {
+      return _iflpzabq.TimelinePage.fromJson(data) as T;
+    }
     if (t == _ir2mn8w1.UserProfile) {
       return _ir2mn8w1.UserProfile.fromJson(data) as T;
     }
@@ -200,6 +210,13 @@ class Protocol extends _isd.DatabaseSerializationManager {
       return (data != null ? _iqhwxw5q.SessionReport.fromJson(data) : null)
           as T;
     }
+    if (t == _isc.getType<_ihf7wrsf.TimelineCheckpoint?>()) {
+      return (data != null ? _ihf7wrsf.TimelineCheckpoint.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_iflpzabq.TimelinePage?>()) {
+      return (data != null ? _iflpzabq.TimelinePage.fromJson(data) : null) as T;
+    }
     if (t == _isc.getType<_ir2mn8w1.UserProfile?>()) {
       return (data != null ? _ir2mn8w1.UserProfile.fromJson(data) : null) as T;
     }
@@ -209,6 +226,12 @@ class Protocol extends _isd.DatabaseSerializationManager {
     }
     if (t == List<double>) {
       return (data as List).map((e) => deserialize<double>(e)).toList() as T;
+    }
+    if (t == List<_ihf7wrsf.TimelineCheckpoint>) {
+      return (data as List)
+              .map((e) => deserialize<_ihf7wrsf.TimelineCheckpoint>(e))
+              .toList()
+          as T;
     }
     if (t == List<_itsbeekw.ActivitySession>) {
       return (data as List)
@@ -239,6 +262,8 @@ class Protocol extends _isd.DatabaseSerializationManager {
       _i2bmhkxi.ScreeningResult => 'ScreeningResult',
       _ikrqxmzf.SessionInput => 'SessionInput',
       _iqhwxw5q.SessionReport => 'SessionReport',
+      _ihf7wrsf.TimelineCheckpoint => 'TimelineCheckpoint',
+      _iflpzabq.TimelinePage => 'TimelinePage',
       _ir2mn8w1.UserProfile => 'UserProfile',
       _ie46f9by.WalkInProgress => 'WalkInProgress',
       _ => null,
@@ -267,6 +292,10 @@ class Protocol extends _isd.DatabaseSerializationManager {
         return 'SessionInput';
       case _iqhwxw5q.SessionReport():
         return 'SessionReport';
+      case _ihf7wrsf.TimelineCheckpoint():
+        return 'TimelineCheckpoint';
+      case _iflpzabq.TimelinePage():
+        return 'TimelinePage';
       case _ir2mn8w1.UserProfile():
         return 'UserProfile';
       case _ie46f9by.WalkInProgress():
@@ -320,6 +349,12 @@ class Protocol extends _isd.DatabaseSerializationManager {
     }
     if (dataClassName == 'SessionReport') {
       return deserialize<_iqhwxw5q.SessionReport>(data['data']);
+    }
+    if (dataClassName == 'TimelineCheckpoint') {
+      return deserialize<_ihf7wrsf.TimelineCheckpoint>(data['data']);
+    }
+    if (dataClassName == 'TimelinePage') {
+      return deserialize<_iflpzabq.TimelinePage>(data['data']);
     }
     if (dataClassName == 'UserProfile') {
       return deserialize<_ir2mn8w1.UserProfile>(data['data']);

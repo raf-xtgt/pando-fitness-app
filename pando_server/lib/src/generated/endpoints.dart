@@ -302,6 +302,25 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['session'] as _ih5ivktc.SessionEndpoint)
                   .list(session),
         ),
+        'timeline': _is.MethodConnector(
+          name: 'timeline',
+          params: {
+            'page': _is.ParameterDescription(
+              name: 'page',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['session'] as _ih5ivktc.SessionEndpoint).timeline(
+                    session,
+                    params['page'],
+                  ),
+        ),
       },
     );
     modules['serverpod_auth_idp'] = _iais.Endpoints()

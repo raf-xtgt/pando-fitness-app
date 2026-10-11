@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:pando_shared/pando_shared.dart';
 import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
@@ -144,6 +145,39 @@ class SessionEndpoint extends Endpoint {
     if (profile == null) return [];
     return _newestFirst(session, profile.id!, limit: 50);
   }
+
+  /// Checkpoints per timeline page.
+  static const int timelinePageSize = 5;
+
+  /// The journey timeline: totals over all the caller's walks, and page
+  /// [page] (0 = newest) of checkpoints, one per wooden sign.
+  Future<TimelinePage> timeline(Session session, int page) async {
+    final profile = await session.requireCallerProfile();
+    final all = await _newestFirst(session, profile.id!);
+    final from = math.max(0, page) * timelinePageSize;
+    return TimelinePage(
+      totalSteps: all.fold(0, (sum, s) => sum + s.steps),
+      totalM: all.fold(0.0, (sum, s) => sum + s.distanceM),
+      totalS: all.fold(0.0, (sum, s) => sum + _seconds(s)),
+      walkCount: all.length,
+      checkpoints: [
+        for (final s in all.skip(from).take(timelinePageSize))
+          TimelineCheckpoint(
+            sessionId: s.id!,
+            endedAt: s.endedAt,
+            totalM: s.endPathM,
+            distanceM: s.distanceM,
+            steps: s.steps,
+            durationS: _seconds(s),
+            ran: s.replay?.segments.any((g) => g.gait == Gait.running) ?? false,
+          ),
+      ],
+      hasEarlier: all.length > from + timelinePageSize,
+    );
+  }
+
+  static double _seconds(ActivitySession s) =>
+      math.max(0, s.endedAt.difference(s.startedAt).inMilliseconds) / 1000;
 
   static Future<List<ActivitySession>> _newestFirst(
     Session session,

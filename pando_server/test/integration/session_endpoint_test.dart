@@ -137,5 +137,44 @@ void main() {
         expect((await endpoints.session.plan(other)).signMetres, hasLength(2));
       },
     );
+
+    test(
+      'when the timeline is asked then it has totals and pages of 5 signs',
+      () async {
+        for (var i = 0; i < 7; i++) {
+          await endpoints.session.save(
+            walker,
+            input('w$i', 100, 1000, hour: i),
+          );
+        }
+        await endpoints.session.save(other, input('x', 900, 1000));
+
+        final first = await endpoints.session.timeline(walker, 0);
+        expect(first.walkCount, 7);
+        expect(first.totalSteps, 700);
+        expect(first.totalM, closeTo(700 * 0.7055, 1e-6));
+        expect(first.totalS, 7 * 15 * 60);
+        expect(first.hasEarlier, isTrue);
+        expect(first.checkpoints, hasLength(5));
+        // Newest first; each sign holds the journey total so far.
+        expect(first.checkpoints.first.totalM, closeTo(first.totalM, 1e-6));
+        expect(first.checkpoints.first.distanceM, closeTo(70.55, 1e-6));
+        expect(first.checkpoints.first.durationS, 15 * 60);
+        expect(first.checkpoints.first.ran, isFalse);
+
+        final second = await endpoints.session.timeline(walker, 1);
+        expect(second.checkpoints, hasLength(2));
+        expect(second.hasEarlier, isFalse);
+        expect(second.checkpoints.last.totalM, closeTo(70.55, 1e-6));
+        expect(second.totalSteps, 700);
+      },
+    );
+
+    test('when there are no walks then the timeline is empty', () async {
+      final page = await endpoints.session.timeline(walker, 0);
+      expect(page.walkCount, 0);
+      expect(page.checkpoints, isEmpty);
+      expect(page.hasEarlier, isFalse);
+    });
   });
 }

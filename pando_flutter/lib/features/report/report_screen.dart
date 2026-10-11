@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pando_client/pando_client.dart';
 
+import '../../app/main_shell.dart';
 import '../../app/theme.dart';
 import '../../services/app_services.dart';
 import '../home/session_row.dart';
@@ -137,13 +138,20 @@ class _Replay extends StatelessWidget {
   Widget build(BuildContext context) {
     final id = replayId;
     if (id == null) {
-      return WobblyBox(
-        seed: 23,
-        padding: const EdgeInsets.all(18),
-        child: Text(
-          'Your replay is on its way. Open this report again in a moment.',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          WobblyBox(
+            seed: 23,
+            padding: const EdgeInsets.all(18),
+            child: Text(
+              'Your replay is on its way. Open this report again in a moment.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Center(child: _TimelineButton()),
+        ],
       );
     }
     final link = AppServices.instance.api.replayPage(id);
@@ -163,37 +171,79 @@ class _Replay extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        Center(
-          child: Semantics(
-            button: true,
-            label: 'Share your walk',
-            child: GestureDetector(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _ReportButton(
+              seed: 29,
+              icon: Icons.share,
+              label: 'Share',
+              semantics: 'Share your walk',
               onTap: () => shareReplay(distanceM, link),
-              child: const WobblyBox(
-                seed: 29,
-                strokeWidth: 2.6,
-                padding: EdgeInsets.symmetric(horizontal: 26, vertical: 12),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.share, color: PandoColors.ink),
-                    SizedBox(width: 8),
-                    Text(
-                      'Share',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
-          ),
+            const SizedBox(width: 12),
+            const _TimelineButton(),
+          ],
         ),
       ],
     );
   }
+}
+
+/// **Timeline**: closes the report and opens the Timeline tab.
+class _TimelineButton extends StatelessWidget {
+  const _TimelineButton();
+
+  @override
+  Widget build(BuildContext context) => _ReportButton(
+    seed: 37,
+    icon: Icons.route_rounded,
+    label: 'Timeline',
+    semantics: 'See your journey timeline',
+    onTap: () => MainShell.openTimeline(context),
+  );
+}
+
+/// A hand-drawn button under the replay: icon and label in a paper box.
+class _ReportButton extends StatelessWidget {
+  const _ReportButton({
+    required this.seed,
+    required this.icon,
+    required this.label,
+    required this.semantics,
+    required this.onTap,
+  });
+
+  final int seed;
+  final IconData icon;
+  final String label;
+  final String semantics;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: semantics,
+    child: GestureDetector(
+      onTap: onTap,
+      child: WobblyBox(
+        seed: seed,
+        strokeWidth: 2.6,
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: PandoColors.ink),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 /// One summary line: label on the left, value on the right, ink rule below.

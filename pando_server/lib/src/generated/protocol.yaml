@@ -16,3 +16,4 @@ session:
   - save:
   - report:
   - list:
+  - timeline:

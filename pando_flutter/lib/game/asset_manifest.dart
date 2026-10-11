@@ -110,6 +110,12 @@ abstract final class AssetManifest {
   // lives outside the gitignored art folder. Full asset paths.
   static const String wordmark = 'assets/lettering/pando_wordmark.svg';
 
+  /// Sneaker prints for the timeline trail: white on transparent (tinted in
+  /// Flutter), toes up, 240 px tall. Cut from the learner's Nano Banana
+  /// image; made for Pando, so committed.
+  static const String printLeft = 'assets/prints/sneaker_left.png';
+  static const String printRight = 'assets/prints/sneaker_right.png';
+
   /// One fire glyph per character of `+123 m`: digits, `m` and `plus`.
   static String fireGlyph(String char) =>
       'assets/lettering/fire_${char == '+' ? 'plus' : char}.svg';

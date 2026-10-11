@@ -21,6 +21,7 @@ import 'package:pando_server/src/generated/future_calls_generated_models/send_re
 import 'package:pando_server/src/generated/screening_result.dart' as _ixx01vju;
 import 'package:pando_server/src/generated/session_input.dart' as _ioouzq3l;
 import 'package:pando_server/src/generated/session_report.dart' as _iyejdiwy;
+import 'package:pando_server/src/generated/timeline_page.dart' as _id1qernc;
 import 'package:pando_server/src/generated/user_profile.dart' as _ism2ds39;
 import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -643,6 +644,37 @@ class _SessionEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<List<_inhq2gcy.ActivitySession>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_id1qernc.TimelinePage> timeline(
+    _ist.TestSessionBuilder sessionBuilder,
+    int page,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'session',
+            method: 'timeline',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'session',
+          methodName: 'timeline',
+          parameters: _ist.testObjectToJson({'page': page}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_id1qernc.TimelinePage>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

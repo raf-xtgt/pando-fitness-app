@@ -101,6 +101,12 @@ class ApiClient {
     return _client.session.list();
   }
 
+  /// Totals and page [page] (0 = newest) of the journey timeline.
+  Future<TimelinePage> timeline(int page) async {
+    await ensureSignedIn();
+    return _client.session.timeline(page);
+  }
+
   Future<void> registerPushToken(String token) async {
     await ensureSignedIn();
     await _client.profile.registerPushToken(token);

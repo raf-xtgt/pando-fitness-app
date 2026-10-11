@@ -17,6 +17,7 @@ import 'package:pando_client/src/protocol/activity_session.dart' as _itsbeekw;
 import 'package:pando_client/src/protocol/screening_result.dart' as _is5jgpax;
 import 'package:pando_client/src/protocol/session_input.dart' as _i6unmrz6;
 import 'package:pando_client/src/protocol/session_report.dart' as _i8rxrde7;
+import 'package:pando_client/src/protocol/timeline_page.dart' as _i8rgbmh0;
 import 'package:pando_client/src/protocol/user_profile.dart' as _i7vdt7l1;
 import 'package:pando_shared/pando_shared.dart' as _ip2bu2mq;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
@@ -221,6 +222,15 @@ class EndpointSession extends _isc.EndpointRef {
         'session',
         'list',
         {},
+      );
+
+  /// The journey timeline: totals over all the caller's walks, and page
+  /// [page] (0 = newest) of checkpoints, one per wooden sign.
+  _ida.Future<_i8rgbmh0.TimelinePage> timeline(int page) =>
+      caller.callServerEndpoint<_i8rgbmh0.TimelinePage>(
+        'session',
+        'timeline',
+        {'page': page},
       );
 }
 

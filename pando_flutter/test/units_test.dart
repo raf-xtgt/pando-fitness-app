@@ -35,4 +35,11 @@ void main() {
     expect(formatStretchTime(65 * 60), '1 h 5 min');
     expect(formatStretchTime(120 * 60), '2 h');
   });
+
+  test('counts get thousands separators', () {
+    expect(formatCount(0), '0');
+    expect(formatCount(999), '999');
+    expect(formatCount(12345), '12,345');
+    expect(formatCount(1234567), '1,234,567');
+  });
 }

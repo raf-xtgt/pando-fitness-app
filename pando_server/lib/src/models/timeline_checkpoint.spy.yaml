@@ -1,0 +1,13 @@
+### One wooden sign on the timeline: where a walk ended on the journey.
+class: TimelineCheckpoint
+fields:
+  sessionId: int
+  endedAt: DateTime
+  ### Journey total at this sign (the session's `endPathM`).
+  totalM: double
+  ### This walk alone.
+  distanceM: double
+  steps: int
+  durationS: double
+  ### The replay has a running stretch (orange footprints).
+  ran: bool

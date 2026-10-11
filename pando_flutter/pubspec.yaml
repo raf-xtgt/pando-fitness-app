@@ -107,6 +107,7 @@ flutter:
     - assets/art/mascot/mascot_still_celebrate.png
     - assets/art/sign/wooden_sign.png
     - assets/lettering/
+    - assets/prints/
 
   fonts:
     - family: Mulish
