@@ -40,6 +40,11 @@ abstract final class AssetManifest {
   static const String pathLayer = 'path';
   static const String pathObject = 'path';
 
+  // Park objects that move (sources as named in park_objects.tsx): trees
+  // sway, the fountain's water sparkles.
+  static const String swayingObjectPrefix = 'objects/park_tree_';
+  static const String fountainObject = 'objects/park_fountain.png';
+
   // Runner: 192x192 frames, one full stride loop per row (built by
   // runner/build_runner.py). Row 0 faces down-right, row 1 faces up-right;
   // the left-hand facings are mirrored in code.

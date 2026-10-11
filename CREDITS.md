@@ -4,12 +4,10 @@ Pando's licensed art is **not** included in this repository (`pando_flutter/asse
 
 | Asset | Used for | Creator / source | Licence |
 |---|---|---|---|
-| Isometric Asset Pack "Peaceful" | Trees, rock | silivar — https://silivar.itch.io/isometric-asset-pack-peaceful | itch.io pack licence: commercial use OK, no redistribution |
-| Flowerbed Build | Flowering bushes | maellemarylloup — https://maellemarylloup.itch.io/flowerbed-build | itch.io pack licence: commercial use OK, no redistribution |
 | Grass Material Tileset | Grass and path tiles | maellemarylloup — https://maellemarylloup.itch.io/grass-material-tileset | itch.io pack licence: commercial use OK, no redistribution |
 | Runner animations | Runner sprite sheets (walk, run, idle in two facings) | Generated with AutoSprite (autosprite.io) for this project from a still of the earlier runner; the earlier runner was built from "Male character constructor set" by macrovector on Freepik | AutoSprite output: see its terms of service; macrovector: free licence, attribution required |
-| Modern City Outdoor 2D Mega Props Pack | Street around the park: fence, street lights, bus stop, hydrant, road, crosswalk, sidewalk | nacl1234 — https://nacl1234.itch.io/top-down-modern-city-outdoor-2d-mega-pack | Commercial licence: use in games/apps OK, modify OK, no redistribution of the source files |
-| Mascot, bench, pond, wooden sign | Mascot animations, park objects, session signs | AI-generated with Nano Banana for this project | — |
+| Modern City Outdoor 2D Mega Props Pack | The park's trees, bushes, flower beds, rocks, fountain, benches, lamp posts, picnic table, cats and pigeons; the street around the park: fence, street lights, bus stop, hydrant, road, crosswalk, sidewalk | nacl1234 — https://nacl1234.itch.io/top-down-modern-city-outdoor-2d-mega-pack | Commercial licence: use in games/apps OK, modify OK, no redistribution of the source files |
+| Mascot, pond, wooden sign | Mascot animations, the pond, session signs | AI-generated with Nano Banana for this project | — |
 | Sneaker prints (`pando_flutter/assets/prints/`, committed) | Footprints on the journey timeline | AI-generated with Nano Banana for this project | — |
 | Mulish | All UI text (`pando_flutter/assets/fonts/`, committed) | The Mulish Project Authors — https://fonts.google.com/specimen/Mulish | SIL Open Font License 1.1 (`OFL.txt`) |
 

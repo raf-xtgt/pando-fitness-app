@@ -1,9 +1,11 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 
 import '../asset_manifest.dart';
+import 'scenery.dart';
 
 /// One copy of the park map, drawn at copy [index] along the endless path.
 ///
@@ -12,6 +14,8 @@ import '../asset_manifest.dart';
 /// furniture) are drawn here from the map's `objects` layer, because
 /// flame_tiled 3.x doesn't render tile objects itself. Objects are
 /// depth-sorted by their base, so nearer things overlap farther ones.
+/// Trees sway and the fountain sparkles ([SwayingSprite], [FountainSparkle]),
+/// unless the phone's "remove animations" setting is on.
 class ParkSegment extends PositionComponent with HasGameReference {
   ParkSegment({
     required this.index,
@@ -23,6 +27,13 @@ class ParkSegment extends PositionComponent with HasGameReference {
 
   /// Shared between all copies; each copy just draws it at its own offset.
   final RenderableTiledMap map;
+
+  /// The phone's "remove animations" setting: no sway, no sparkle.
+  static bool get _still =>
+      PlatformDispatcher.instance.accessibilityFeatures.disableAnimations;
+
+  /// Seeded by the copy, so each copy of the park sways a little differently.
+  late final math.Random _random = math.Random(index);
 
   @override
   Future<void> onLoad() async {
@@ -54,15 +65,44 @@ class ParkSegment extends PositionComponent with HasGameReference {
       final image = await game.images.load(
         '${AssetManifest.parkObjectsFolder}$source',
       );
-      add(
-        SpriteComponent(
-          sprite: Sprite(image),
-          size: Vector2(object.width, object.height),
+      final sprite = Sprite(image);
+      final size = Vector2(object.width, object.height);
+      final priority = base.y.round();
+      if (_still) {
+        add(
+          SpriteComponent(
+            sprite: sprite,
+            size: size,
+            position: base,
+            anchor: Anchor.bottomCenter,
+            priority: priority,
+          ),
+        );
+      } else if (source.startsWith(AssetManifest.swayingObjectPrefix)) {
+        add(
+          SwayingSprite(
+            sprite: sprite,
+            size: size,
+            position: base,
+            priority: priority,
+            phase: _random.nextDouble() * 2 * math.pi,
+          ),
+        );
+      } else {
+        final component = SpriteComponent(
+          sprite: sprite,
+          size: size,
           position: base,
           anchor: Anchor.bottomCenter,
-          priority: base.y.round(),
-        ),
-      );
+          priority: priority,
+        );
+        if (source == AssetManifest.fountainObject) {
+          component.add(
+            FountainSparkle(size: size, seed: _random.nextInt(1 << 30)),
+          );
+        }
+        add(component);
+      }
     }
   }
 }
