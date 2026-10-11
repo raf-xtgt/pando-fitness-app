@@ -43,8 +43,8 @@ void main() {
       () async {
         final plan = await endpoints.session.plan(walker);
         expect(plan.goalSteps, 1000);
-        expect(plan.strideM, closeTo(0.7055, 1e-9));
-        expect(plan.goalM, closeTo(705.5, 1e-6));
+        expect(plan.strideM, closeTo(0.663, 1e-9));
+        expect(plan.goalM, closeTo(663, 1e-6));
         expect(plan.resumeMetres, 0);
         expect(plan.signMetres, [0]);
       },
@@ -57,10 +57,10 @@ void main() {
           walker,
           input('a', 1200, 1000),
         );
-        expect(saved.distanceM, closeTo(1200 * 0.7055, 1e-6));
+        expect(saved.distanceM, closeTo(1200 * 0.663, 1e-6));
         expect(saved.goalMet, isTrue);
         expect(saved.stoppedEarly, isFalse);
-        expect(saved.extraM, closeTo(200 * 0.7055, 1e-6));
+        expect(saved.extraM, closeTo(200 * 0.663, 1e-6));
         expect(saved.startPathM, 0);
         expect(saved.endPathM, closeTo(saved.distanceM, 1e-9));
         expect(
@@ -152,20 +152,20 @@ void main() {
         final first = await endpoints.session.timeline(walker, 0);
         expect(first.walkCount, 7);
         expect(first.totalSteps, 700);
-        expect(first.totalM, closeTo(700 * 0.7055, 1e-6));
+        expect(first.totalM, closeTo(700 * 0.663, 1e-6));
         expect(first.totalS, 7 * 15 * 60);
         expect(first.hasEarlier, isTrue);
         expect(first.checkpoints, hasLength(5));
         // Newest first; each sign holds the journey total so far.
         expect(first.checkpoints.first.totalM, closeTo(first.totalM, 1e-6));
-        expect(first.checkpoints.first.distanceM, closeTo(70.55, 1e-6));
+        expect(first.checkpoints.first.distanceM, closeTo(66.3, 1e-6));
         expect(first.checkpoints.first.durationS, 15 * 60);
         expect(first.checkpoints.first.ran, isFalse);
 
         final second = await endpoints.session.timeline(walker, 1);
         expect(second.checkpoints, hasLength(2));
         expect(second.hasEarlier, isFalse);
-        expect(second.checkpoints.last.totalM, closeTo(70.55, 1e-6));
+        expect(second.checkpoints.last.totalM, closeTo(66.3, 1e-6));
         expect(second.totalSteps, 700);
       },
     );

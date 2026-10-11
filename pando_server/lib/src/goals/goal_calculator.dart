@@ -18,7 +18,10 @@ enum Difficulty {
 
 /// Pure Dart goal rules. Goals are kept in steps and shown in metres.
 abstract final class GoalCalculator {
-  static const double strideFactor = 0.415;
+  /// Stride = height × this (0.64 m at 5 ft 5 in). 0.39, not the usual
+  /// 0.415: real easy-pace steps are shorter and the phone counts a few
+  /// extra, so distance stays on the safe side (park test, 2026-10-11).
+  static const double strideFactor = 0.39;
   static const int firstGoalSteps = 1000;
 
   /// How many recent sessions make the baseline.

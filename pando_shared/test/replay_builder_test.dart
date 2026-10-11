@@ -138,7 +138,7 @@ void main() {
     });
 
     test('short stretches join their longer neighbour', () {
-      // walk 3 min, run 30 s, walk 2 min, stand 1 min, walk 2 min.
+      // walk 3 min, run 30 s, walk 2 min, stand 30 s, walk 2 min.
       final replay = chapterReplay(
         build(
           run(0, [
@@ -146,18 +146,32 @@ void main() {
             70,
             ...List.filled(4, 50),
             0,
-            0,
             ...List.filled(4, 50),
           ]),
         ),
       );
       expect(replay.segments.map((s) => s.gait), [Gait.walking]);
-      expect(replay.segments.single.realS, 17 * 30);
+      expect(replay.segments.single.realS, 16 * 30);
     });
 
-    test('a walk shorter than 90 s is one chapter', () {
+    test('a walk shorter than 60 s is one chapter', () {
       final replay = chapterReplay(build(run(0, [50, 70])));
       expect(replay.segments, hasLength(1));
+    });
+
+    test('a 90 s run between walks stays: two running slices', () {
+      // Park test, session 5: the run's edges fall in walking slices.
+      final replay = chapterReplay(
+        build(
+          run(0, [...List.filled(7, 50), 66, 75, 62, ...List.filled(5, 50)]),
+        ),
+      );
+      expect(replay.segments.map((s) => s.gait), [
+        Gait.walking,
+        Gait.running,
+        Gait.walking,
+      ]);
+      expect(replay.segments[1].realS, 60);
     });
 
     test('metres and play time add up; ends at the end sign', () {

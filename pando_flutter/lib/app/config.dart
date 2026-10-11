@@ -13,8 +13,9 @@ abstract final class AppConfig {
   /// Used until the user's real height is known.
   static const double defaultHeightMetres = 1.70;
 
-  /// Stride length = height × this.
-  static const double strideFactor = 0.415;
+  /// Stride length = height × this (same as the server's
+  /// `GoalCalculator.strideFactor`).
+  static const double strideFactor = 0.39;
 
   /// The first goal is this many steps.
   static const int firstGoalSteps = 1000;

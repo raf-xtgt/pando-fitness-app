@@ -7,10 +7,10 @@ void main() {
       expect(GoalCalculator.goalSteps([]), 1000);
     });
 
-    test('when height is 1.75 m then the first goal is about 730 m', () {
+    test('when height is 1.75 m then the first goal is about 680 m', () {
       final metres =
           GoalCalculator.goalSteps([]) * GoalCalculator.strideM(1.75);
-      expect(metres, closeTo(726.25, 0.01));
+      expect(metres, closeTo(682.5, 0.01));
     });
 
     test(

@@ -107,8 +107,10 @@ Replay buildReplay({
   );
 }
 
-/// Shortest real stretch the replay shows as its own chapter.
-const double chapterMinRealS = 90;
+/// Shortest real stretch the replay shows as its own chapter. 60 s, so any
+/// run of 90 s or more shows: it always fills at least two whole 30 s
+/// slices (park test, 2026-10-11: 90 s runs gave 60 s of running slices).
+const double chapterMinRealS = 60;
 
 /// [replay] in chapters: the whole session in a few long stretches
 /// ("Walking 1.2 km for 18 min", then "Running …"), for the caption and the

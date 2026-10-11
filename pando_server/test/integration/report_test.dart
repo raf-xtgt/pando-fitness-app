@@ -62,8 +62,8 @@ void main() {
     });
 
     test('then save stores a filled-in report message', () async {
-      expect(first.reportMessage, contains('847 m'));
-      expect(first.reportMessage, contains('141 m'));
+      expect(first.reportMessage, contains('796 m'));
+      expect(first.reportMessage, contains('133 m'));
       expect(second.reportMessage, isNot(contains('{')));
     });
 
