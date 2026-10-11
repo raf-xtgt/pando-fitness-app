@@ -18,6 +18,7 @@ void main() {
         // The page and the API are on the same server.
         client: Client('${base.origin}/'),
         replayId: replayIdFrom(base),
+        embedded: base.queryParameters['embed'] == '1',
       ),
     ),
   );

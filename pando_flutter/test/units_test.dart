@@ -28,4 +28,11 @@ void main() {
     expect(formatFeetInches(48), '4 ft 0 in');
     expect(formatFeetInches(84), '7 ft 0 in');
   });
+
+  test('stretch times: seconds, minutes, hours', () {
+    expect(formatStretchTime(45), '45 s');
+    expect(formatStretchTime(18 * 60 + 10), '18 min');
+    expect(formatStretchTime(65 * 60), '1 h 5 min');
+    expect(formatStretchTime(120 * 60), '2 h');
+  });
 }

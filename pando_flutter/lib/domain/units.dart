@@ -23,3 +23,12 @@ String formatFeetInches(int inches) => '${inches ~/ 12} ft ${inches % 12} in';
 String formatWalkDistance(double metres) => metres >= 1000
     ? '${(metres / 1000).toStringAsFixed(1)} km'
     : '${metres.round()} m';
+
+/// A stretch of real time: `45 s` below a minute, `18 min`, else `1 h 5 min`.
+String formatStretchTime(double seconds) {
+  if (seconds < 60) return '${seconds.round()} s';
+  final minutes = (seconds / 60).round();
+  if (minutes < 60) return '$minutes min';
+  final rest = minutes % 60;
+  return rest == 0 ? '${minutes ~/ 60} h' : '${minutes ~/ 60} h $rest min';
+}

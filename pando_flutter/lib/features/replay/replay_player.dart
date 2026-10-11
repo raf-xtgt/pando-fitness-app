@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:pando_shared/pando_shared.dart';
 
 import '../../app/theme.dart';
+import '../../domain/units.dart';
 import '../../game/park_game.dart';
 import 'replay_loading.dart';
 
@@ -11,9 +12,10 @@ import 'replay_loading.dart';
 /// finished (**Replay**).
 enum _Phase { loading, ready, playing, finished }
 
-/// Plays a [Replay] on the park: the runner walks, runs or stands segment by
-/// segment from the start sign, the mascot follows, and the end sign drops
-/// at the end. It waits for **Play**; **Replay** plays it again. Used by the
+/// Plays a [Replay] on the park in chapters ([chapterReplay]): the runner
+/// walks, runs or stands chapter by chapter from the start sign, the mascot
+/// follows, a caption at the top centre of the map names the chapter ("Running ·
+/// 800 m · 6 min"), and the end sign drops at the end. It waits for **Play**; **Replay** plays it again. Used by the
 /// replay web page.
 class ReplayPlayer extends StatefulWidget {
   const ReplayPlayer({super.key, required this.replay});
@@ -30,10 +32,13 @@ class _ReplayPlayerState extends State<ReplayPlayer>
   late final Ticker _ticker = createTicker(_onTick);
   _Phase _phase = _Phase.loading;
 
+  /// The chapter playing, for the caption.
+  int _chapter = 0;
+
   /// A new game for each play, so the end sign of the last play is gone.
   int _play = 0;
 
-  Replay get _replay => widget.replay;
+  late final Replay _replay = chapterReplay(widget.replay);
 
   @override
   void initState() {
@@ -51,6 +56,7 @@ class _ReplayPlayerState extends State<ReplayPlayer>
     );
     setState(() {
       _phase = _Phase.loading;
+      _chapter = 0;
       _play++;
       _game = game;
     });
@@ -72,6 +78,8 @@ class _ReplayPlayerState extends State<ReplayPlayer>
     final playS = elapsed.inMilliseconds / 1000;
     final at = replayAt(_replay, playS);
     _game.showAt(at.metres, at.gait);
+    final chapter = segmentAt(_replay, playS);
+    if (chapter != _chapter) setState(() => _chapter = chapter);
     if (playS >= _replay.durationS) {
       _ticker.stop();
       _game.placeSign(_replay.endPathM);
@@ -92,6 +100,33 @@ class _ReplayPlayerState extends State<ReplayPlayer>
         Positioned.fill(
           child: GameWidget(key: ValueKey(_play), game: _game),
         ),
+        if (_phase == _Phase.playing || _phase == _Phase.finished)
+          Positioned(
+            left: 12,
+            right: 12,
+            top: 12,
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(
+                    scale: Tween(begin: 0.85, end: 1.0).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutBack,
+                      ),
+                    ),
+                    child: child,
+                  ),
+                ),
+                child: _ChapterCaption(
+                  key: ValueKey('$_play/$_chapter'),
+                  chapter: _replay.segments[_chapter],
+                ),
+              ),
+            ),
+          ),
         if (_phase == _Phase.loading)
           const Positioned.fill(child: ReplayLoading()),
         if (_phase == _Phase.ready)
@@ -119,6 +154,64 @@ class _ReplayPlayerState extends State<ReplayPlayer>
             ),
           ),
       ],
+    );
+  }
+}
+
+/// The chapter on top of the map: a fire-orange paper label with the gait
+/// in big letters and its distance and real time under it, e.g. "Running" /
+/// "800 m · 6 min".
+class _ChapterCaption extends StatelessWidget {
+  const _ChapterCaption({super.key, required this.chapter});
+
+  final ReplaySegment chapter;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = switch (chapter.gait) {
+      Gait.running => 'Running',
+      Gait.walking => 'Walking',
+      Gait.standing => 'Resting',
+    };
+    final detail = [
+      if (chapter.gait != Gait.standing)
+        formatWalkDistance(chapter.toM - chapter.fromM),
+      formatStretchTime(chapter.realS),
+    ].join(' · ');
+    const light = PandoColors.paper;
+    return Semantics(
+      liveRegion: true,
+      label: '$label, $detail',
+      child: ExcludeSemantics(
+        child: WobblyBox(
+          seed: 17,
+          fill: PandoColors.fire,
+          strokeWidth: 2.8,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: light,
+                  fontSize: 26,
+                  height: 1.1,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                detail,
+                style: const TextStyle(
+                  color: light,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

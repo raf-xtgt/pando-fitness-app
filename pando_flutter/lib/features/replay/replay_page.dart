@@ -8,13 +8,22 @@ import 'replay_player.dart';
 
 /// The public replay page (`/replay/<replayId>`): the Pando name, a short
 /// line, and the walk playing on the park. Nothing else about the walker.
+/// [embedded] (`?embed=1`, in the report) shows only the park, since the
+/// report has its own title.
 class ReplayPage extends StatefulWidget {
-  const ReplayPage({super.key, required this.client, required this.replayId});
+  const ReplayPage({
+    super.key,
+    required this.client,
+    required this.replayId,
+    this.embedded = false,
+  });
 
   final Client client;
 
   /// From the link; null if the link has no valid id.
   final UuidValue? replayId;
+
+  final bool embedded;
 
   @override
   State<ReplayPage> createState() => _ReplayPageState();
@@ -48,6 +57,7 @@ class _ReplayPageState extends State<ReplayPage> {
                     : "This replay isn't here. Check the link?",
               );
             }
+            if (widget.embedded) return ReplayPlayer(replay: replay);
             return Column(
               children: [
                 Padding(

@@ -107,6 +107,68 @@ Replay buildReplay({
   );
 }
 
+/// Shortest real stretch the replay shows as its own chapter.
+const double chapterMinRealS = 90;
+
+/// [replay] in chapters: the whole session in a few long stretches
+/// ("Walking 1.2 km for 18 min", then "Running …"), for the caption and the
+/// runner.
+///
+/// While a segment is shorter than [minRealS] of real time, the shortest one
+/// joins its longer neighbour and takes that neighbour's gait; next segments
+/// with the same gait then merge. Speed inside a chapter is even (metres and
+/// play time add up, so the replay still ends at the end sign on time).
+Replay chapterReplay(Replay replay, {double minRealS = chapterMinRealS}) {
+  final chapters = [...replay.segments];
+  while (chapters.length > 1) {
+    var shortest = 0;
+    for (var i = 1; i < chapters.length; i++) {
+      if (chapters[i].realS < chapters[shortest].realS) shortest = i;
+    }
+    if (chapters[shortest].realS >= minRealS) break;
+    final before = shortest > 0 ? chapters[shortest - 1] : null;
+    final after = shortest + 1 < chapters.length
+        ? chapters[shortest + 1]
+        : null;
+    final intoBefore =
+        after == null || (before != null && before.realS >= after.realS);
+    final first = intoBefore ? shortest - 1 : shortest;
+    final keep = intoBefore ? before! : after;
+    chapters.replaceRange(first, first + 2, [
+      _join(chapters[first], chapters[first + 1], keep.gait),
+    ]);
+    // A joined chapter can now sit next to one with the same gait.
+    for (var i = chapters.length - 1; i > 0; i--) {
+      if (chapters[i].gait == chapters[i - 1].gait) {
+        chapters.replaceRange(i - 1, i + 1, [
+          _join(chapters[i - 1], chapters[i], chapters[i].gait),
+        ]);
+      }
+    }
+  }
+  return replay.copyWith(segments: chapters);
+}
+
+ReplaySegment _join(ReplaySegment a, ReplaySegment b, Gait gait) =>
+    ReplaySegment(
+      fromM: a.fromM,
+      toM: b.toM,
+      gait: gait,
+      realS: a.realS + b.realS,
+      playS: a.playS + b.playS,
+    );
+
+/// Index of the segment that plays at [playS] seconds; the last one after
+/// the end.
+int segmentAt(Replay replay, double playS) {
+  var elapsed = 0.0;
+  for (var i = 0; i < replay.segments.length; i++) {
+    elapsed += replay.segments[i].playS;
+    if (playS < elapsed) return i;
+  }
+  return replay.segments.length - 1;
+}
+
 /// Where the replay is at [playS] seconds: journey metres and gait. Before
 /// the start it's the start sign; after the end, the end sign (standing).
 ({double metres, Gait gait}) replayAt(Replay replay, double playS) {

@@ -5,7 +5,8 @@ import '../../app/theme.dart';
 import 'replay_loading.dart';
 
 /// The replay page (`/replay/<replayId>`) inside the report, in a WebView:
-/// the same page anyone with the link sees.
+/// the same page anyone with the link sees, embedded (`?embed=1`: the park
+/// only, no title).
 class ReplayView extends StatefulWidget {
   const ReplayView({super.key, required this.url});
 
@@ -29,7 +30,11 @@ class _ReplayViewState extends State<ReplayView> {
         },
       ),
     )
-    ..loadRequest(widget.url);
+    ..loadRequest(
+      widget.url.replace(
+        queryParameters: {...widget.url.queryParameters, 'embed': '1'},
+      ),
+    );
 
   @override
   Widget build(BuildContext context) => Stack(

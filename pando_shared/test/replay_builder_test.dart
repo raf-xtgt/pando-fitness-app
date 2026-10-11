@@ -109,4 +109,82 @@ void main() {
     expect(replayAt(replay, 99).metres, replay.endPathM);
     expect(replayAt(replay, 99).gait, Gait.standing);
   });
+
+  group('chapterReplay', () {
+    // 30 s slices: walking 50, running 70, standing 0 steps.
+    List<WalkSlice> run(int from, List<int> steps) => [
+      for (var i = 0; i < steps.length; i++) slice(from + i, steps[i]),
+    ];
+
+    test('long stretches stay: walk 3 min → run 2 min → walk 2 min', () {
+      final replay = chapterReplay(
+        build(
+          run(0, [
+            ...List.filled(6, 50),
+            ...List.filled(4, 70),
+            50,
+            50,
+            50,
+            50,
+          ]),
+        ),
+      );
+      expect(replay.segments.map((s) => s.gait), [
+        Gait.walking,
+        Gait.running,
+        Gait.walking,
+      ]);
+      expect(replay.segments.map((s) => s.realS), [180, 120, 120]);
+    });
+
+    test('short stretches join their longer neighbour', () {
+      // walk 3 min, run 30 s, walk 2 min, stand 1 min, walk 2 min.
+      final replay = chapterReplay(
+        build(
+          run(0, [
+            ...List.filled(6, 50),
+            70,
+            ...List.filled(4, 50),
+            0,
+            0,
+            ...List.filled(4, 50),
+          ]),
+        ),
+      );
+      expect(replay.segments.map((s) => s.gait), [Gait.walking]);
+      expect(replay.segments.single.realS, 17 * 30);
+    });
+
+    test('a walk shorter than 90 s is one chapter', () {
+      final replay = chapterReplay(build(run(0, [50, 70])));
+      expect(replay.segments, hasLength(1));
+    });
+
+    test('metres and play time add up; ends at the end sign', () {
+      final full = build(
+        run(0, [...List.filled(5, 50), 70, 0, ...List.filled(4, 70)]),
+      );
+      final replay = chapterReplay(full);
+      expect(replay.segments.first.fromM, full.startPathM);
+      expect(replay.segments.last.toM, closeTo(full.endPathM, 1e-9));
+      expect(
+        replay.segments.fold<double>(0, (sum, s) => sum + s.playS),
+        closeTo(full.durationS, 1e-9),
+      );
+      for (var i = 1; i < replay.segments.length; i++) {
+        expect(replay.segments[i].fromM, replay.segments[i - 1].toM);
+        expect(replay.segments[i].gait, isNot(replay.segments[i - 1].gait));
+      }
+    });
+
+    test('segmentAt finds the chapter playing', () {
+      final replay = chapterReplay(
+        build(run(0, [...List.filled(6, 50), ...List.filled(6, 70)])),
+      );
+      final firstEnd = replay.segments.first.playS;
+      expect(segmentAt(replay, 0), 0);
+      expect(segmentAt(replay, firstEnd + 0.1), 1);
+      expect(segmentAt(replay, 999), 1);
+    });
+  });
 }
