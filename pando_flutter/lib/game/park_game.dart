@@ -22,11 +22,24 @@ export 'components/mascot.dart' show MascotMove;
 /// [showAt]. The game knows nothing about steps or
 /// the server.
 class ParkGame extends FlameGame {
-  ParkGame({this.resumeMetres = 0, this.signMetres = const [0]});
+  ParkGame({
+    this.resumeMetres = 0,
+    this.signMetres = const [0],
+    this.pixelsPerMetre = livePixelsPerMetre,
+  });
 
-  /// Tunable: map pixels per metre walked. ~7.8 means a ~730 m first goal
-  /// crosses roughly two copies of the park.
-  static const double pixelsPerMetre = 7.8;
+  /// Tunable, live walk: map pixels per metre walked. One tile along the
+  /// path is ~143 px, so an easy walk (~1.07 m/s) moves ~0.5 tile/s and a
+  /// jog (~1.6 m/s) ~0.75 tile/s; one copy of the park is ~42 m (learner,
+  /// 2026-10-12: at 7.8 the runner barely moved and hung at corners).
+  static const double livePixelsPerMetre = 67;
+
+  /// Tunable, replay: the whole walk plays in 15–90 s, so it keeps the
+  /// smaller scale (~365 m per copy of the park) to stay watchable.
+  static const double replayPixelsPerMetre = 7.8;
+
+  /// Map pixels per metre for this game (signs and runner use it).
+  final double pixelsPerMetre;
 
   /// Tunable: how many map pixels fit across the phone's width. At 700 the
   /// view stays on the park; the street rows around it fill the corners.

@@ -53,6 +53,7 @@ class _ReplayPlayerState extends State<ReplayPlayer>
     final game = ParkGame(
       resumeMetres: _replay.startPathM,
       signMetres: [_replay.startPathM],
+      pixelsPerMetre: ParkGame.replayPixelsPerMetre,
     );
     setState(() {
       _phase = _Phase.loading;

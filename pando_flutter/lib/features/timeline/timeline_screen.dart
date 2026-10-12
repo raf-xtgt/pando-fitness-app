@@ -149,8 +149,6 @@ class _TimelineScreenState extends State<TimelineScreen> {
                 )
               else ...[
                 JourneyTotals.of(totals),
-                const SizedBox(height: 12),
-                const _Legend(),
                 if (_checkpoints.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 24),
@@ -209,37 +207,6 @@ class _TimelineScreenState extends State<TimelineScreen> {
   }
 }
 
-/// What the print colours mean: ink for walking, fire orange for a walk
-/// with running in it.
-class _Legend extends StatelessWidget {
-  const _Legend();
-
-  @override
-  Widget build(BuildContext context) {
-    Widget item(Color color, String label) => Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(
-          AssetManifest.printRight,
-          height: 22,
-          color: color,
-          colorBlendMode: BlendMode.srcIn,
-        ),
-        const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 15)),
-      ],
-    );
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        item(PandoColors.ink.withValues(alpha: 0.8), 'walked'),
-        const SizedBox(width: 24),
-        item(PandoColors.fire, 'ran'),
-      ],
-    );
-  }
-}
-
 /// The winding trail: signs, labels, footprints, and the mascot by the
 /// newest sign. The start sign (0 m) closes the trail once every walk is
 /// loaded; otherwise the prints fade out below the last sign.
@@ -269,19 +236,21 @@ class _Trail extends StatelessWidget {
           tail: hasEarlier ? 170 : 0,
           top: checkpoints.isEmpty ? 30 : 160,
         );
-        final prints = <(Footprint, bool ran, double fade)>[
+        // All prints in ink: a walk with a little running in it would read
+        // as all running in orange (learner, 2026-10-12).
+        final prints = <(Footprint, double fade)>[
           for (var i = 0; i < nodes - 1; i++)
-            for (final p in layout.gap(i)) (p, checkpoints[i].ran, 1.0),
+            for (final p in layout.gap(i)) (p, 1.0),
           if (hasEarlier && checkpoints.isNotEmpty)
             for (final (n, p) in layout.gap(nodes - 1, fromBelow: true).indexed)
-              (p, checkpoints.last.ran, (n + 1) / TrailLayout.printsPerGap),
+              (p, (n + 1) / TrailLayout.printsPerGap),
         ];
         return SizedBox(
           height: layout.height,
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              for (final (p, ran, fade) in prints)
+              for (final (p, fade) in prints)
                 Positioned(
                   left: p.position.dx - printHeight * 0.21,
                   top: p.position.dy - printHeight / 2,
@@ -292,8 +261,7 @@ class _Trail extends StatelessWidget {
                           ? AssetManifest.printLeft
                           : AssetManifest.printRight,
                       height: printHeight,
-                      color: (ran ? PandoColors.fire : PandoColors.ink)
-                          .withValues(alpha: (ran ? 0.95 : 0.8) * fade),
+                      color: PandoColors.ink.withValues(alpha: 0.8 * fade),
                       colorBlendMode: BlendMode.srcIn,
                       filterQuality: FilterQuality.medium,
                     ),
