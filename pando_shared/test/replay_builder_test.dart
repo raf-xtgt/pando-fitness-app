@@ -159,8 +159,8 @@ void main() {
       expect(replay.segments, hasLength(1));
     });
 
-    test('a 90 s run between walks stays: two running slices', () {
-      // Park test, session 5: the run's edges fall in walking slices.
+    test('a 90 s run between walks stays, edge slices included', () {
+      // Park test 2026-10-11, session 5: 132 | 150 | 124 steps/min.
       final replay = chapterReplay(
         build(
           run(0, [...List.filled(7, 50), 66, 75, 62, ...List.filled(5, 50)]),
@@ -171,7 +171,59 @@ void main() {
         Gait.running,
         Gait.walking,
       ]);
-      expect(replay.segments[1].realS, 60);
+      expect(replay.segments[1].realS, 90);
+    });
+
+    test('walk → run → walk → run → walk: both runs with their edges', () {
+      // Park test 2026-10-13 (demo walk): 124 | 158 | 128 and 118 | 148 | 140.
+      final replay = chapterReplay(
+        build(
+          run(0, [
+            ...List.filled(4, 55),
+            62,
+            79,
+            64,
+            ...List.filled(6, 53),
+            59,
+            74,
+            70,
+            ...List.filled(6, 53),
+          ]),
+        ),
+      );
+      expect(replay.segments.map((s) => s.gait), [
+        Gait.walking,
+        Gait.running,
+        Gait.walking,
+        Gait.running,
+        Gait.walking,
+      ]);
+      expect(replay.segments.map((s) => s.realS), [120, 90, 180, 90, 180]);
+    });
+
+    test('a walking slice next to a run stays walking below 115/min', () {
+      final replay = build(run(0, [50, 56, 70, 70, 50]));
+      expect(replay.segments.map((s) => s.realS), [60, 60, 30]);
+    });
+
+    test('running gets 3× its share of the play time', () {
+      // walk 6 min, run 2 min, walk 4 min: weighted 360 + 360 + 240 s.
+      final replay = chapterReplay(
+        build(
+          run(0, [
+            ...List.filled(12, 50),
+            ...List.filled(4, 70),
+            ...List.filled(8, 50),
+          ]),
+        ),
+      );
+      final plays = replay.segments.map((s) => s.playS).toList();
+      expect(plays[1], closeTo(replay.durationS * 360 / 960, 1e-9));
+      expect(
+        plays.fold<double>(0, (a, b) => a + b),
+        closeTo(replay.durationS, 1e-9),
+      );
+      expect(replay.segments[1].realS, 120);
     });
 
     test('metres and play time add up; ends at the end sign', () {
