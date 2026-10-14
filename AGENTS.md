@@ -1,7 +1,27 @@
-# Flutter & Serverpod project
+# Pando: Flutter & Serverpod project
+
+Pando is a walking and running app for Android. The phone's step sensor counts real steps (no GPS), and a runner moves along an endless park drawn with Flame. Five minutes after an activity, a Serverpod future call sends a report with a replay of the activity. See `README.md` for the product and architecture.
 
 This project is a Flutter app (frontend) backed by a Serverpod server (backend). Always build the app's backend with Serverpod.
-Build for multiple users, use Serverpod's built-in authentication, which is already set up in `lib/server.dart`.
+Build for multiple users. Auth is Serverpod's anonymous sign-in (one phone = one user), set up in `pando_server/lib/server.dart`.
+
+## Packages
+
+| Folder | What |
+|---|---|
+| `pando_flutter/` | The Android app (Flutter + Flame). |
+| `pando_server/` | The Serverpod server: endpoints, models (`lib/src/models/`, including the phone-only `WalkInProgress`), migrations, future calls. |
+| `pando_shared/` | Dart models and logic shared by the app, server and web replay (`WalkSlice`, `Gait`, `Replay`, `buildReplay`). |
+| `pando_client/` | Generated client. Never edit. |
+
+## Things to know
+
+- The licensed art in `pando_flutter/assets/art/` and the replay web build in `pando_server/web/replay/` are gitignored. Never commit them. Art file names are listed in `pando_flutter/lib/game/asset_manifest.dart`.
+- `WalkSlice` syncs from the phone to Postgres with Serverpod offline sync (experimental, `database: sync`). `WalkInProgress` lives only on the phone (`database: client`).
+- The stride rule (height × 0.39) exists in both `pando_server/lib/src/goals/goal_calculator.dart` and `pando_flutter/lib/app/config.dart`. Keep them equal.
+- Production runs on Google Cloud Run as one Docker image in two roles: `serverless` (the API) and `maintenance` (a job that runs due future calls). Secrets come from env vars, never from files in the repo.
+
+## Working with Serverpod
 
 The user starts the server and Flutter app with `serverpod start`. There is no need to check if the server is running: make the changes and call the `serverpod` MCP tools as needed. If the server is not running, an informative error message will be received from the MCP server. Then STOP and ask the user to start it. NEVER start the server yourself. The Flutter app is started along with it, or can be launched from the MCP tool `spawn_flutter_app`.
 
@@ -46,5 +66,3 @@ If the user asks you to test the app:
 3. Use `flutter_driver` (`dart` MCP) to navigate through the app
 
 The app is launched from `pando_flutter/lib/driver.dart`, which starts the Flutter driver extension with text entry emulation turned off so the app stays usable by hand. To let the driver type, set `enableTextEntryEmulation: true` there and `hot_restart` the app.
-
-IMPORTANT: After building the first version of the app, update this AGENTS.md file with information about the app we're building. KEEP the info about the MCP server and the checklist. Remove this paragraph.
