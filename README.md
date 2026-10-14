@@ -11,6 +11,22 @@ Built with Flutter and Serverpod 4 for "Build Something Real: The Serverpod Hack
 | Demo video (1:52) | https://youtu.be/_DqSh_mj4Z4 |
 | A shared replay | https://pando-server-hbgj2wlv5a-as.a.run.app/replay/39b81784-88fa-4f93-82e0-c0c152ec663f |
 
+## Try the app via the APK here
+
+**[Download pando-v1.0.apk](https://github.com/raf-xtgt/pando-fitness-app/releases/latest/download/pando-v1.0.apk)** (69 MB, from the [latest release](https://github.com/raf-xtgt/pando-fitness-app/releases/latest)). It talks to the live Serverpod instance on Cloud Run.
+
+| Step | What to do |
+|---|---|
+| 1. Install | Open the APK on an Android phone. Allow "Install unknown apps" for your browser or Files app when asked. |
+| 2. Allow | Say yes to "Physical activity" (step counting) and notifications (the report). |
+| 3. Set up | Pick your height (Pando turns it into your stride), then answer the short safety check. |
+| 4. Optional | Long-press "Your walks" on Home to add three past walks. Without them, your first goal is 1,000 steps. |
+| 5. Walk | Tap the mascot, lock the phone, and walk or run. Airplane mode is fine. |
+| 6. Stop | Tap "Stop activity" and say how it felt. Go back online if you were offline. |
+| 7. Wait | About 5 minutes later the report arrives as a push, with a replay you can share. |
+
+Needs Android with a step counter sensor (most phones have one). There is no iOS build yet. The APK is debug-signed, so Android may warn before installing.
+
 <p>
   <img src="docs/images/splash.png" width="19%" alt="Splash screen with the Pando mascot">
   <img src="docs/images/home.png" width="19%" alt="Home: totals and past walks">
